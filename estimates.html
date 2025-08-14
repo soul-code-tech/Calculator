@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Сметы и документы - Строительные расчеты</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #e0e0e0;
+      text-align: center;
+      min-height: 100vh;
+      padding: 15px;
+      position: relative;
+      overflow: hidden;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Эффект мерцающих звезд в фоне */
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .star {
+      position: absolute;
+      background: #ffffff;
+      border-radius: 50%;
+      animation: twinkle 3s infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.8; }
+    }
+
+    .page {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .container {
+      max-width: 100%;
+      margin: 15px auto;
+      padding: 20px 15px;
+      background: rgba(15, 25, 35, 0.85);
+      border: 2px solid #4CAF50;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
+      position: relative;
+      overflow: hidden;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+    }
+
+    .container::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: #4CAF50;
+      font-size: 1.8em;
+      text-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+      margin-bottom: 15px;
+      position: relative;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    h1::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+      margin: 10px auto;
+    }
+
+    .subtitle {
+      font-size: 1.1em;
+      color: #b0bec5;
+      margin-bottom: 20px;
+      font-weight: 300;
+      line-height: 1.4;
+    }
+
+    .submenu {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin: 20px 0;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #4CAF50 rgba(30, 40, 50, 0.7);
+    }
+
+    .submenu::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .submenu::-webkit-scrollbar-track {
+      background: rgba(30, 40, 50, 0.5);
+      border-radius: 4px;
+    }
+
+    .submenu::-webkit-scrollbar-thumb {
+      background: #4CAF50;
+      border-radius: 4px;
+    }
+
+    .submenu::-webkit-scrollbar-thumb:hover {
+      background: #8BC34A;
+    }
+
+    .submenu-item {
+      background: rgba(30, 40, 50, 0.7);
+      border: 1px solid #4CAF50;
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .submenu-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+      background: rgba(40, 50, 60, 0.8);
+    }
+
+    .submenu-item::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px;
+      height: 100%;
+      background: #4CAF50;
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+    }
+
+    .submenu-item:hover::before {
+      transform: scaleY(1);
+    }
+
+    .submenu-icon {
+      font-size: 2.2em;
+      width: 50px;
+      text-align: center;
+      color: #4CAF50;
+      transition: all 0.3s ease;
+    }
+
+    .submenu-item:hover .submenu-icon {
+      transform: scale(1.2);
+    }
+
+    .submenu-title {
+      font-family: 'Orbitron', sans-serif;
+      color: #4CAF50;
+      font-size: 1.3em;
+      margin-bottom: 8px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .submenu-description {
+      color: #b0bec5;
+      font-size: 1em;
+      line-height: 1.4;
+      font-weight: 300;
+    }
+
+    .calculator-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px 0;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #4CAF50 rgba(30, 40, 50, 0.7);
+    }
+
+    .calculator-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .calculator-container::-webkit-scrollbar-track {
+      background: rgba(30, 40, 50, 0.5);
+      border-radius: 4px;
+    }
+
+    .calculator-container::-webkit-scrollbar-thumb {
+      background: #4CAF50;
+      border-radius: 4px;
+    }
+
+    .calculator-container::-webkit-scrollbar-thumb:hover {
+      background: #8BC34A;
+    }
+
+    .input-group {
+      width: 100%;
+      max-width: 300px;
+      margin: 15px 0;
+    }
+
+    .input-label {
+      display: block;
+      text-align: left;
+      margin-bottom: 6px;
+      color: #4CAF50;
+      font-weight: 500;
+      font-size: 1.05em;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      background: rgba(30, 40, 50, 0.7);
+      border: 1px solid #4CAF50;
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-family: 'Roboto', sans-serif;
+      font-size: 1.1em;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #8BC34A;
+      box-shadow: 0 0 8px rgba(139, 195, 74, 0.3);
+    }
+
+    .btn-calculator {
+      background: #4CAF50;
+      color: #0d2a17;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-family: 'Roboto', sans-serif;
+      font-size: 1.1em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 15px 0;
+      width: 100%;
+      max-width: 300px;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    }
+
+    .btn-calculator:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 15px rgba(76, 175, 80, 0.7);
+    }
+
+    .result-container {
+      background: rgba(30, 40, 50, 0.7);
+      border: 1px solid #4CAF50;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 20px 0;
+      width: 100%;
+      max-width: 300px;
+      text-align: left;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+      display: none;
+    }
+
+    .result-title {
+      font-family: 'Orbitron', sans-serif;
+      color: #4CAF50;
+      font-size: 1.4em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .result-text {
+      color: #e0e0e0;
+      line-height: 1.5;
+      font-size: 1.05em;
+    }
+
+    .info-box {
+      background: rgba(30, 40, 50, 0.5);
+      border: 1px solid #4CAF50;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 15px 0;
+      text-align: left;
+      font-size: 0.95em;
+      line-height: 1.4;
+    }
+
+    .info-title {
+      color: #4CAF50;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .nav-buttons {
+      margin: 20px auto 10px;
+      display: flex;
+      justify-content: space-between;
+      max-width: 100%;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn-back, .btn-home {
+      display: inline-block;
+      padding: 12px 20px;
+      background: rgba(76, 175, 80, 0.25);
+      color: #4CAF50;
+      text-decoration: none;
+      border: 1px solid #4CAF50;
+      border-radius: 10px;
+      font-size: 1.1em;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+      min-width: 120px;
+      flex: 1;
+    }
+
+    .btn-back:hover, .btn-home:hover {
+      background: rgba(76, 175, 80, 0.4);
+      transform: scale(1.03);
+      box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Специфичные стили для сметы */
+    .estimate-table {
+      width: 100%;
+      max-width: 90%;
+      border-collapse: collapse;
+      margin: 20px auto;
+    }
+
+    .estimate-table th {
+      background-color: #4CAF50;
+      color: #0d2a17;
+      padding: 10px;
+      text-align: left;
+    }
+
+    .estimate-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .estimate-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .estimate-table tr:nth-child(even) {
+      background-color: rgba(30, 40, 50, 0.5);
+    }
+
+    .estimate-table tr:hover {
+      background-color: rgba(76, 175, 80, 0.1);
+    }
+
+    .estimate-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .btn-estimate {
+      background: #4CAF50;
+      color: #0d2a17;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 15px;
+      font-family: 'Roboto', sans-serif;
+      font-size: 1em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+    }
+
+    .btn-estimate:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 12px rgba(76, 175, 80, 0.5);
+    }
+
+    .btn-add-row {
+      background: #4CAF50;
+      color: #0d2a17;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 1.2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    /* Адаптация для мобильных устройств */
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px 10px;
+        border-radius: 16px;
+      }
+      
+      .input-field {
+        font-size: 1.05em;
+      }
+      
+      .btn-calculator {
+        font-size: 1.05em;
+      }
+      
+      .estimate-table {
+        font-size: 0.9em;
+      }
+      
+      .estimate-table th, .estimate-table td {
+        padding: 6px;
+      }
+      
+      .btn-add-row {
+        width: 32px;
+        height: 32px;
+        font-size: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  
+  <div class="container">
+    <!-- Главное меню смет и документов -->
+    <div id="main-menu" class="page">
+      <h1>📝 Сметы и документы</h1>
+      <p class="subtitle">Профессиональные расчеты и документация по ГОСТ и СНиП</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация:</div>
+        <p>Все документы соответствуют действующим нормативным документам РФ</p>
+        <p>СНиП 82-02-95 "Методические указания по разработке проектов организации строительства и проектов производства работ"</p>
+      </div>
+      
+      <div class="submenu">
+        <div class="submenu-item" onclick="showSection('estimate')">
+          <div class="submenu-icon">💰</div>
+          <div>
+            <div class="submenu-title">Сметы</div>
+            <div class="submenu-description">Формирование сметы по ГОСТ, СНиП с экспортом в PDF</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('documents')">
+          <div class="submenu-icon">📄</div>
+          <div>
+            <div class="submenu-title">Документы</div>
+            <div class="submenu-description">Акты, договоры, счет-фактуры в формате Word/Excel</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('training')">
+          <div class="submenu-icon">🎓</div>
+          <div>
+            <div class="submenu-title">Обучение</div>
+            <div class="submenu-description">Инструкции и обучающие гайды по строительным работам</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="index.html" class="btn-back">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Сметы -->
+    <div id="estimate" class="page hidden">
+      <h1>💰 Сметы</h1>
+      <p class="subtitle">Формирование сметы по ГОСТ, СНиП с экспортом в PDF</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Смета составляется по методике, утвержденной приказом Минстроя России от 05.12.2017 № 1550/пр</p>
+        <p>Соответствует требованиям СНиП 82-02-95 и МДС 81-35.2004</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Название проекта:</label>
+          <input type="text" class="input-field" id="estimate-project-name" placeholder="Введите название проекта" value="Строительство жилого дома">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Адрес объекта:</label>
+          <input type="text" class="input-field" id="estimate-address" placeholder="Введите адрес" value="г. Москва, ул. Ленина, д. 15">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Заказчик:</label>
+          <input type="text" class="input-field" id="estimate-customer" placeholder="Введите заказчика" value="ИП Иванов И.И.">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Подрядчик:</label>
+          <input type="text" class="input-field" id="estimate-contractor" placeholder="Введите подрядчика" value="СтройГрупп ООО">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Нормативный индекс пересчета:</label>
+          <select class="input-field" id="estimate-index">
+            <option value="1.0">1.0 (без индекса)</option>
+            <option value="1.15">1.15 (индекс 2023 г.)</option>
+            <option value="1.2">1.2 (индекс 2024 г.)</option>
+          </select>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 20px 0 10px;">Материалы</h2>
+        
+        <table class="estimate-table" id="materials-table">
+          <thead>
+            <tr>
+              <th width="5%">№</th>
+              <th width="45%">Наименование</th>
+              <th width="15%">Кол-во</th>
+              <th width="20%">Цена за ед. (руб.)</th>
+              <th width="20%">Сумма (руб.)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><input type="text" class="input-field" style="width: 100%; padding: 5px;" value="Кирпич одинарный" /></td>
+              <td><input type="number" class="input-field" style="width: 100%; padding: 5px;" value="10000" /></td>
+              <td><input type="number" class="input-field" style="width: 100%; padding: 5px;" value="15" /></td>
+              <td class="material-total">150000</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><input type="text" class="input-field" style="width: 100%; padding: 5px;" value="Цемент М500" /></td>
+              <td><input type="number" class="input-field" style="width: 100%; padding: 5px;" value="50" /></td>
+              <td><input type="number" class="input-field" style="width: 100%; padding: 5px;" value="450" /></td>
+              <td class="material-total">22500</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><input type="text" class="input-field" style="width: 100%; padding: 5px;" value="Песок строительный" /></td>
+              <td><input type="number" class="input-field" style="width: 100%; padding: 5px;" value="20" /></td>
+              <td><input type="number" class="input-field" style="width: 100%; padding: 5px;" value="1200" /></td>
+              <td class="material-total">24000</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div style="display: flex; justify-content: center;">
+          <button class="btn-add-row" onclick="addMaterialRow()">+</button>
+        </div>
+        
+        <div class="input-group" style="margin-top: 20px;">
+          <label class="input-label">Накладные расходы (%):</label>
+          <input type="number" class="input-field" id="estimate-overhead" placeholder="Введите процент" value="15">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Стоимость аренды техники (руб.):</label>
+          <input type="number" class="input-field" id="estimate-equipment" placeholder="Введите сумму" value="150000">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Оплата труда рабочих (руб.):</label>
+          <input type="number" class="input-field" id="estimate-labor" placeholder="Введите сумму" value="350000">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Прочие расходы (руб.):</label>
+          <input type="number" class="input-field" id="estimate-other" placeholder="Введите сумму" value="50000">
+        </div>
+        
+        <div class="result-container" id="estimate-result" style="display: block; margin-top: 30px;">
+          <div class="result-title">Итоговая смета</div>
+          <div class="result-text" id="estimate-result-text">
+            <p><strong>Стоимость материалов:</strong> <span id="total-materials">196500</span> руб.</p>
+            <p><strong>Накладные расходы (15%):</strong> <span id="total-overhead">29475</span> руб.</p>
+            <p><strong>Аренда техники:</strong> <span id="total-equipment">150000</span> руб.</p>
+            <p><strong>Оплата труда:</strong> <span id="total-labor">350000</span> руб.</p>
+            <p><strong>Прочие расходы:</strong> <span id="total-other">50000</span> руб.</p>
+            <p style="font-weight: bold; margin-top: 10px; font-size: 1.2em;"><strong>ИТОГОВАЯ СТОИМОСТЬ:</strong> <span id="total-estimate" style="color: #4CAF50;">775975</span> руб.</p>
+          </div>
+        </div>
+        
+        <div class="estimate-actions">
+          <button class="btn-estimate" onclick="calculateEstimate()">
+            Пересчитать смету
+          </button>
+          <button class="btn-estimate" onclick="generatePDF()">
+            Сформировать PDF
+          </button>
+          <button class="btn-estimate" onclick="saveEstimate()">
+            Сохранить смету
+          </button>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Документы -->
+    <div id="documents" class="page hidden">
+      <h1>📄 Документы</h1>
+      <p class="subtitle">Акты, договоры, счет-фактуры в формате Word/Excel</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по документам:</div>
+        <p>Все документы соответствуют требованиям ГОСТ Р 7.0.97-2016 и 429.1-2014</p>
+        <p>Шаблоны готовы к редактированию в Microsoft Word и Excel</p>
+      </div>
+      
+      <div class="calculator-container">
+        <h2 style="color: #4CAF50; margin: 20px 0 10px;">Акты выполненных работ</h2>
+        
+        <div class="submenu-item" onclick="downloadDocument('act_work')">
+          <div class="submenu-icon">📑</div>
+          <div>
+            <div class="submenu-title">Акт выполненных работ (форма КС-2)</div>
+            <div class="submenu-description">DOCX, 25 КБ</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="downloadDocument('act_cost')">
+          <div class="submenu-icon">📑</div>
+          <div>
+            <div class="submenu-title">Справка о стоимости выполненных работ (форма КС-3)</div>
+            <div class="submenu-description">XLSX, 32 КБ</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="downloadDocument('act_acceptance')">
+          <div class="submenu-icon">📑</div>
+          <div>
+            <div class="submenu-title">Акт приемки выполненных работ</div>
+            <div class="submenu-description">DOCX, 18 КБ</div>
+          </div>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 30px 0 10px;">Договоры</h2>
+        
+        <div class="submenu-item" onclick="downloadDocument('contract_work')">
+          <div class="submenu-icon">📑</div>
+          <div>
+            <div class="submenu-title">Договор подряда на строительные работы</div>
+            <div class="submenu-description">DOCX, 45 КБ</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="downloadDocument('contract_supply')">
+          <div class="submenu-icon">📑</div>
+          <div>
+            <div class="submenu-title">Договор поставки строительных материалов</div>
+            <div class="submenu-description">DOCX, 38 КБ</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="downloadDocument('contract_general')">
+          <div class="submenu-icon">📑</div>
+          <div>
+            <div class="submenu-title">Генеральный подрядный договор</div>
+            <div class="submenu-description">DOCX, 62 КБ</div>
+          </div>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 30px 0 10px;">Счета и накладные</h2>
+        
+        <div class="submenu-item" onclick="downloadDocument('invoice')">
+          <div class="submenu-icon">📑</div>
+          <div>
+            <div class="submenu-title">Счет-фактура</div>
+            <div class="submenu-description">XLSX, 22 КБ</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="downloadDocument('waybill')">
+          <div class="submenu-icon">📑</div>
+          <div>
+            <div class="submenu-title">Товарная накладная (форма ТОРГ-12)</div>
+            <div class="submenu-description">XLSX, 28 КБ</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="downloadDocument('specification')">
+          <div class="submenu-icon">📑</div>
+          <div>
+            <div class="submenu-title">Спецификация к договору</div>
+            <div class="submenu-description">XLSX, 24 КБ</div>
+          </div>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 30px 0 10px;">Сметная документация</h2>
+        
+        <div class="submenu-item" onclick="downloadDocument('estimate_form')">
+          <div class="submenu-icon">📑</div>
+          <div>
+            <div class="submenu-title">Смета в формате Microsoft Excel</div>
+            <div class="submenu-description">XLSX, 42 КБ</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="downloadDocument('estimate_gesn')">
+          <div class="submenu-icon">📑</div>
+          <div>
+            <div class="submenu-title">Смета по ГЭСН (Государственные элементные сметные нормы)</div>
+            <div class="submenu-description">XLSX, 85 КБ</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="downloadDocument('estimate_fer')">
+          <div class="submenu-icon">📑</div>
+          <div>
+            <div class="submenu-title">Смета по ФЕР (Федеральные единичные расценки)</div>
+            <div class="submenu-description">XLSX, 78 КБ</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Обучение -->
+    <div id="training" class="page hidden">
+      <h1>🎓 Обучение</h1>
+      <p class="subtitle">Инструкции и обучающие гайды по строительным работам</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по обучению:</div>
+        <p>Все инструкции соответствуют требованиям СНиП 3.04.01-87 "Изоляционные и отделочные покрытия"</p>
+        <p>Материалы подготовлены в соответствии с современными строительными нормами и правилами</p>
+      </div>
+      
+      <div class="calculator-container">
+        <h2 style="color: #4CAF50; margin: 20px 0 10px;">Инструкции по материалам</h2>
+        
+        <div class="submenu-item" onclick="showTraining('mix-preparation')">
+          <div class="submenu-icon">🧪</div>
+          <div>
+            <div class="submenu-title">Приготовление строительных растворов</div>
+            <div class="submenu-description">Как правильно замешивать цементный, гипсовый и другие растворы</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showTraining('adhesive-application')">
+          <div class="submenu-icon">🧴</div>
+          <div>
+            <div class="submenu-title">Нанесение клея</div>
+            <div class="submenu-description">Правильная техника нанесения различных видов клея для отделочных работ</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showTraining('surface-preparation')">
+          <div class="submenu-icon">🧹</div>
+          <div>
+            <div class="submenu-title">Подготовка поверхностей</div>
+            <div class="submenu-description">Этапы подготовки стен, потолков и полов перед отделкой</div>
+          </div>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 30px 0 10px;">Инструкции по отделке</h2>
+        
+        <div class="submenu-item" onclick="showTraining('wallpaper-pasting')">
+          <div class="submenu-icon">🎨</div>
+          <div>
+            <div class="submenu-title">Поклейка обоев</div>
+            <div class="submenu-description">Пошаговая инструкция по поклейке различных видов обоев</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showTraining('laminate-installation')">
+          <div class="submenu-icon">🪵</div>
+          <div>
+            <div class="submenu-title">Укладка ламината</div>
+            <div class="submenu-description">Как правильно уложить ламинат на различные типы оснований</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showTraining('tile-laying')">
+          <div class="submenu-icon">🪨</div>
+          <div>
+            <div class="submenu-title">Укладка плитки</div>
+            <div class="submenu-description">Технология укладки плитки на стены и пол</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showTraining('linoleum-laying')">
+          <div class="submenu-icon">🧵</div>
+          <div>
+            <div class="submenu-title">Укладка линолеума</div>
+            <div class="submenu-description">Как правильно уложить линолеум без пузырей и складок</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showTraining('drywall-installation')">
+          <div class="submenu-icon">🧱</div>
+          <div>
+            <div class="submenu-title">Монтаж гипсокартона</div>
+            <div class="submenu-description">Установка гипсокартона на стены и потолок</div>
+          </div>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 30px 0 10px;">Обучающие гайды</h2>
+        
+        <div class="submenu-item" onclick="showTraining('wall-construction')">
+          <div class="submenu-icon">🏗️</div>
+          <div>
+            <div class="submenu-title">Возведение стен</div>
+            <div class="submenu-description">Технология кладки кирпича, блоков и других материалов</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showTraining('plumbing-installation')">
+          <div class="submenu-icon">🚿</div>
+          <div>
+            <div class="submenu-title">Монтаж сантехники для начинающих</div>
+            <div class="submenu-description">Пошаговая инструкция по установке раковин, унитазов и смесителей</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showTraining('electrical-installation')">
+          <div class="submenu-icon">⚡</div>
+          <div>
+            <div class="submenu-title">Электромонтажные работы</div>
+            <div class="submenu-description">Безопасная установка розеток, выключателей и освещения</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showTraining('roof-installation')">
+          <div class="submenu-icon">🏠</div>
+          <div>
+            <div class="submenu-title">Монтаж кровли</div>
+            <div class="submenu-description">Установка различных типов кровельных покрытий</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showTraining('fence-installation')">
+          <div class="submenu-icon">🔩</div>
+          <div>
+            <div class="submenu-title">Установка забора</div>
+            <div class="submenu-description">Пошаговая инструкция по монтажу забора из профлиста и кирпича</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Инструкция по приготовлению растворов -->
+    <div id="training-mix-preparation" class="page hidden">
+      <h1>🧪 Приготовление строительных растворов</h1>
+      <p class="subtitle">Как правильно замешивать цементный, гипсовый и другие растворы</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация:</div>
+        <p>Все инструкции соответствуют требованиям СНиП 3.04.01-87 "Изоляционные и отделочные покрытия"</p>
+        <p>Соблюдайте пропорции и последовательность приготовления для достижения максимальной прочности</p>
+      </div>
+      
+      <div class="calculator-container">
+        <h2 style="color: #4CAF50; margin: 15px 0 10px;">Цементно-песчаный раствор</h2>
+        
+        <div class="info-box">
+          <div class="info-title">Пропорции:</div>
+          <p>Цемент М400 : Песок = 1 : 3 (на 1 часть цемента 3 части песка)</p>
+          <p>Вода : Цемент = 0.4 : 1 (на 1 часть цемента 0.4 части воды)</p>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Требуемый объем раствора (м³):</label>
+          <input type="number" class="input-field" id="mix-cement-volume" placeholder="Введите объем" value="0.1" oninput="calculateMixPreparation()">
+        </div>
+        
+        <div class="result-container" style="display: block; margin-top: 15px;">
+          <div class="result-title">Необходимые материалы</div>
+          <div class="result-text" id="mix-cement-result">
+            <p><strong>Цемент М400:</strong> 330 кг</p>
+            <p><strong>Песок:</strong> 990 кг</p>
+            <p><strong>Вода:</strong> 132 л</p>
+          </div>
+        </div>
+        
+        <h3 style="color: #4CAF50; margin: 20px 0 10px; text-align: left;">Пошаговая инструкция:</h3>
+        <ol style="text-align: left; padding-left: 20px; margin-bottom: 20px; line-height: 1.5;">
+          <li>Подготовьте все необходимые материалы и инструменты</li>
+          <li>Отмерьте необходимое количество сухих компонентов (цемент и песок)</li>
+          <li>Тщательно перемешайте сухие компоненты до однородного состояния</li>
+          <li>Постепенно добавляйте воду, постоянно перемешивая раствор</li>
+          <li>Продолжайте перемешивание до получения однородной пластичной массы без комков</li>
+          <li>Дайте раствору "созреть" в течение 5-10 минут</li>
+          <li>Повторно перемешайте перед использованием</li>
+        </ol>
+        
+        <div class="info-box">
+          <div class="info-title">Важные замечания:</div>
+          <p>Не добавляйте воду в уже готовый раствор для увеличения подвижности</p>
+          <p>Раствор необходимо использовать в течение 1-1.5 часов после приготовления</p>
+          <p>Температура окружающей среды должна быть выше +5°C</p>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 25px 0 10px;">Гипсовый раствор</h2>
+        
+        <div class="info-box">
+          <div class="info-title">Пропорции:</div>
+          <p>Гипс : Вода = 1 : 0.6 (на 1 часть гипса 0.6 части воды)</p>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Требуемый объем раствора (м³):</label>
+          <input type="number" class="input-field" id="mix-gypsum-volume" placeholder="Введите объем" value="0.05" oninput="calculateMixPreparation()">
+        </div>
+        
+        <div class="result-container" style="display: block; margin-top: 15px;">
+          <div class="result-title">Необходимые материалы</div>
+          <div class="result-text" id="mix-gypsum-result">
+            <p><strong>Гипс:</strong> 150 кг</p>
+            <p><strong>Вода:</strong> 90 л</p>
+          </div>
+        </div>
+        
+        <h3 style="color: #4CAF50; margin: 20px 0 10px; text-align: left;">Пошаговая инструкция:</h3>
+        <ol style="text-align: left; padding-left: 20px; margin-bottom: 20px; line-height: 1.5;">
+          <li>Подготовьте чистую емкость для замешивания</li>
+          <li>Налейте необходимое количество воды</li>
+          <li>Постепенно всыпайте гипс в воду, постоянно перемешивая</li>
+          <li>Продолжайте перемешивание до получения однородной массы без комков</li>
+          <li>Используйте раствор в течение 5-10 минут после приготовления</li>
+        </ol>
+        
+        <div class="info-box">
+          <div class="info-title">Важные замечания:</div>
+          <p>Гипс схватывается очень быстро, поэтому готовьте небольшие порции</p>
+          <p>Не добавляйте воду в уже готовый гипсовый раствор</p>
+          <p>Не используйте металлические инструменты для замешивания</p>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('training')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Инструкция по нанесению клея -->
+    <div id="training-adhesive-application" class="page hidden">
+      <h1>🧴 Нанесение клея</h1>
+      <p class="subtitle">Правильная техника нанесения различных видов клея для отделочных работ</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация:</div>
+        <p>Все инструкции соответствуют требованиям СНиП 3.04.01-87 "Изоляционные и отделочные покрытия"</p>
+        <p>Правильное нанесение клея обеспечивает надежное сцепление материалов</p>
+      </div>
+      
+      <div class="calculator-container">
+        <h2 style="color: #4CAF50; margin: 15px 0 10px;">Клей для плитки</h2>
+        
+        <div class="info-box">
+          <div class="info-title">Инструменты:</div>
+          <p>Шпатель зубчатый с размером зуба 6-10 мм</p>
+          <p>Резиновый молоток</p>
+          <p>Крестики для плитки</p>
+        </div>
+        
+        <h3 style="color: #4CAF50; margin: 20px 0 10px; text-align: left;">Пошаговая инструкция:</h3>
+        <ol style="text-align: left; padding-left: 20px; margin-bottom: 20px; line-height: 1.5;">
+          <li>Подготовьте поверхность: очистите от пыли, обезжирьте, загрунтуйте</li>
+          <li>Нанесите клей на поверхность зубчатым шпателем под углом 45°</li>
+          <li>Двигайтесь равномерно, создавая параллельные борозды</li>
+          <li>Для вертикальных поверхностей начинайте снизу вверх</li>
+          <li>Нанесите тонкий слой клея на тыльную сторону плитки</li>
+          <li>Уложите плитку, слегка прижмите и постучите резиновым молотком</li>
+          <li>Установите крестики для соблюдения одинакового шва</li>
+          <li>Удалите излишки клея сразу после укладки</li>
+        </ol>
+        
+        <div class="info-box">
+          <div class="info-title">Важные замечания:</div>
+          <p>Не наносите клей на площадь больше 1 м² за один раз</p>
+          <p>Работайте при температуре от +5°C до +25°C</p>
+          <p>Избегайте попадания прямых солнечных лучей на уложенную плитку</p>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 25px 0 10px;">Клей для обоев</h2>
+        
+        <div class="info-box">
+          <div class="info-title">Инструменты:</div>
+          <p>Валик или кисть для нанесения клея</p>
+          <p>Пластиковый шпатель</p>
+          <p>Сухая тряпка</p>
+        </div>
+        
+        <h3 style="color: #4CAF50; margin: 20px 0 10px; text-align: left;">Пошаговая инструкция:</h3>
+        <ol style="text-align: left; padding-left: 20px; margin-bottom: 20px; line-height: 1.5;">
+          <li>Подготовьте поверхность: зашпаклюйте неровности, загрунтуйте</li>
+          <li>Разведите клей согласно инструкции на упаковке</li>
+          <li>Дайте клею настояться 5-10 минут</li>
+          <li>Нанесите клей равномерным слоем на оборотную сторону обоев</li>
+          <li>Сложите обои "лицо к лицу" и дайте пропитаться 3-5 минут</li>
+          <li>Нанесите клей на стену в области стыка с предыдущим полотном</li>
+          <li>Аккуратно приложите обои к стене, начиная с верхнего угла</li>
+          <li>Разгладьте обои от центра к краям пластиковым шпателем</li>
+          <li>Удалите излишки клея сухой тряпкой</li>
+        </ol>
+        
+        <div class="info-box">
+          <div class="info-title">Важные замечания:</div>
+          <p>Для флизелиновых обоев клей наносится только на стену</p>
+          <p>Для виниловых обоев дайте им пропитаться 10-15 минут</p>
+          <p>Не используйте излишнее количество клея, чтобы избежать размокания обоев</p>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 25px 0 10px;">Клей для ламината</h2>
+        
+        <div class="info-box">
+          <div class="info-title">Инструменты:</div>
+          <p>Шпатель зубчатый с размером зуба 3-4 мм</p>
+          <p>Резиновый валик</p>
+          <p>Монтажная лента</p>
+        </div>
+        
+        <h3 style="color: #4CAF50; margin: 20px 0 10px; text-align: left;">Пошаговая инструкция:</h3>
+        <ol style="text-align: left; padding-left: 20px; margin-bottom: 20px; line-height: 1.5;">
+          <li>Подготовьте основание: оно должно быть ровным, сухим и чистым</li>
+          <li>Разметьте стартовую линию параллельно стене</li>
+          <li>Нанесите клей зубчатым шпателем на небольшой участок основания</li>
+          <li>Создайте равномерный слой с параллельными бороздами</li>
+          <li>Уложите ламинат, плотно прижмите и прокатите резиновым валиком</li>
+          <li>Сразу удалите излишки клея</li>
+          <li>Продолжайте работу, переходя к следующему участку</li>
+        </ol>
+        
+        <div class="info-box">
+          <div class="info-title">Важные замечания:</div>
+          <p>Не наносите клей на площадь больше 2 м² за один раз</p>
+          <p>Работайте в одном направлении, чтобы избежать стыков клея</p>
+          <p>Оставьте температурный зазор 8-10 мм у стен</p>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('training')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Инструкция по поклейке обоев -->
+    <div id="training-wallpaper-pasting" class="page hidden">
+      <h1>🎨 Поклейка обоев</h1>
+      <p class="subtitle">Пошаговая инструкция по поклейке различных видов обоев</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация:</div>
+        <p>Все инструкции соответствуют требованиям СНиП 3.04.01-87 "Изоляционные и отделочные покрытия"</p>
+        <p>Правильная поклейка обоев обеспечивает долговечность и эстетичный вид</p>
+      </div>
+      
+      <div class="calculator-container">
+        <h2 style="color: #4CAF50; margin: 15px 0 10px;">Подготовка поверхности</h2>
+        
+        <h3 style="color: #4CAF50; margin: 20px 0 10px; text-align: left;">Этапы подготовки:</h3>
+        <ol style="text-align: left; padding-left: 20px; margin-bottom: 20px; line-height: 1.5;">
+          <li>Удалите старые обои, краску или другие покрытия</li>
+          <li>Заделайте трещины и сколы шпаклевкой</li>
+          <li>Загрунтуйте поверхность для лучшего сцепления</li>
+          <li>Дайте поверхности полностью высохнуть</li>
+          <li>Проверьте ровность стен с помощью уровня</li>
+        </ol>
+        
+        <div class="info-box">
+          <div class="info-title">Важные замечания:</div>
+          <p>Поверхность должна быть сухой, чистой и обезжиренной</p>
+          <p>Температура в помещении должна быть от +10°C до +25°C</p>
+          <p>Влажность не должна превышать 60%</p>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 25px 0 10px;">Поклейка бумажных обоев</h2>
+        
+        <h3 style="color: #4CAF50; margin: 20px 0 10px; text-align: left;">Пошаговая инструкция:</h3>
+        <ol style="text-align: left; padding-left: 20px; margin-bottom: 20px; line-height: 1.5;">
+          <li>Отрежьте полосу обоев с запасом 5-10 см сверху и снизу</li>
+          <li>Нанесите клей на оборотную сторону обоев</li>
+          <li>Сложите обои "лицо к лицу" и дайте пропитаться 3-5 минут</li>
+          <li>Сделайте вертикальную разметку на стене с помощью отвеса</li>
+          <li>Нанесите клей на стену в области стыка с предыдущим полотном</li>
+          <li>Аккуратно приложите обои к стене, начиная с верхнего угла</li>
+          <li>Разгладьте обои от центра к краям пластиковым шпателем</li>
+          <li>Обрежьте излишки у потолка и плинтуса острым ножом</li>
+          <li>Тщательно удалите излишки клея влажной губкой</li>
+        </ol>
+        
+        <div class="info-box">
+          <div class="info-title">Важные замечания:</div>
+          <p>Бумажные обои сильно растягиваются, поэтому работайте аккуратно</p>
+          <p>Не допускайте образования пузырей воздуха</p>
+          <p>Старайтесь не намочить стыки, чтобы избежать вздутия</p>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 25px 0 10px;">Поклейка флизелиновых обоев</h2>
+        
+        <h3 style="color: #4CAF50; margin: 20px 0 10px; text-align: left;">Пошаговая инструкция:</h3>
+        <ol style="text-align: left; padding-left: 20px; margin-bottom: 20px; line-height: 1.5;">
+          <li>Отрежьте полосу обоев с запасом 5-10 см сверху и снизу</li>
+          <li>Нанесите клей непосредственно на стену</li>
+          <li>Дайте клею немного впитаться (3-5 минут)</li>
+          <li>Сделайте вертикальную разметку на стене с помощью отвеса</li>
+          <li>Аккуратно приложите обои к стене, начиная с верхнего угла</li>
+          <li>Разгладьте обои от центра к краям пластиковым шпателем</li>
+          <li>Обрежьте излишки у потолка и плинтуса острым ножом</li>
+          <li>Тщательно удалите излишки клея влажной губкой</li>
+        </ol>
+        
+        <div class="info-box">
+          <div class="info-title">Важные замечания:</div>
+          <p>Флизелиновые обои не растягиваются, поэтому проще в работе</p>
+          <p>Клей наносится только на стену, не на обои</p>
+          <p>Стыки флизелиновых обоев можно вплотную подгонять друг к другу</p>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 25px 0 10px;">Поклейка виниловых обоев</h2>
+        
+        <h3 style="color: #4CAF50; margin: 20px 0 10px; text-align: left;">Пошаговая инструкция:</h3>
+        <ol style="text-align: left; padding-left: 20px; margin-bottom: 20px; line-height: 1.5;">
+          <li>Отрежьте полосу обоев с запасом 5-10 см сверху и снизу</li>
+          <li>Нанесите клей на оборотную сторону обоев</li>
+          <li>Сложите обои "лицо к лицу" и дайте пропитаться 10-15 минут</li>
+          <li>Сделайте вертикальную разметку на стене с помощью отвеса</li>
+          <li>Нанесите клей на стену в области стыка с предыдущим полотном</li>
+          <li>Аккуратно приложите обои к стене, начиная с верхнего угла</li>
+          <li>Разгладьте обои от центра к краям пластиковым шпателем</li>
+          <li>Обрежьте излишки у потолка и плинтуса острым ножом</li>
+          <li>Тщательно удалите излишки клея влажной губкой</li>
+        </ol>
+        
+        <div class="info-box">
+          <div class="info-title">Важные замечания:</div>
+          <p>Виниловые обои дольше пропитываются клеем</p>
+          <p>Не используйте излишнее количество клея</p>
+          <p>Виниловые обои лучше клеить вдвоем из-за их веса</p>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('training')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Инструкция по монтажу сантехники -->
+    <div id="training-plumbing-installation" class="page hidden">
+      <h1>🚿 Монтаж сантехники для начинающих</h1>
+      <p class="subtitle">Пошаговая инструкция по установке раковин, унитазов и смесителей</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация:</div>
+        <p>Все инструкции соответствуют требованиям СНиП 3.05.01-85 "Внутренние санитарно-технические системы"</p>
+        <p>Работа с сантехникой требует внимательности и соблюдения правил безопасности</p>
+      </div>
+      
+      <div class="calculator-container">
+        <h2 style="color: #4CAF50; margin: 15px 0 10px;">Установка раковины</h2>
+        
+        <div class="info-box">
+          <div class="info-title">Необходимые инструменты:</div>
+          <p>Дрель с коронкой по керамике</p>
+          <p>Гаечные ключи</p>
+          <p>Силиконовый герметик</p>
+          <p>Сифон и гибкая подводка</p>
+        </div>
+        
+        <h3 style="color: #4CAF50; margin: 20px 0 10px; text-align: left;">Пошаговая инструкция:</h3>
+        <ol style="text-align: left; padding-left: 20px; margin-bottom: 20px; line-height: 1.5;">
+          <li>Подготовьте место установки: проверьте ровность стены и пола</li>
+          <li>Установите смеситель на раковину согласно инструкции</li>
+          <li>Соберите сифон и подключите к сливному отверстию раковины</li>
+          <li>Нанесите силиконовый герметик по краю раковины</li>
+          <li>Установите раковину на подготовленное место</li>
+          <li>Подключите гибкую подводку к смесителю и водопроводу</li>
+          <li>Проверьте соединения на наличие протечек</li>
+          <li>Закрепите раковину к стене при необходимости</li>
+        </ol>
+        
+        <div class="info-box">
+          <div class="info-title">Важные замечания:</div>
+          <p>Перед началом работ перекройте воду на стояке</p>
+          <p>Проверьте все соединения на герметичность</p>
+          <p>Обеспечьте уклон сифона для правильного отвода воды</p>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 25px 0 10px;">Установка унитаза</h2>
+        
+        <div class="info-box">
+          <div class="info-title">Необходимые инструменты:</div>
+          <p>Монтажный комплект для унитаза</p>
+          <p>Силиконовый герметик</p>
+          <p>Гаечные ключи</p>
+          <p>Перфоратор</p>
+        </div>
+        
+        <h3 style="color: #4CAF50; margin: 20px 0 10px; text-align: left;">Пошаговая инструкция:</h3>
+        <ol style="text-align: left; padding-left: 20px; margin-bottom: 20px; line-height: 1.5;">
+          <li>Подготовьте место установки: проверьте ровность пола и расположение канализационного стояка</li>
+          <li>Установите монтажную пластину на пол вокруг канализационного отверстия</li>
+          <li>Нанесите силиконовый герметик на нижнюю часть унитаза</li>
+          <li>Установите унитаз на место, совместив с канализационным отверстием</li>
+          <li>Зафиксируйте унитаз к полу с помощью болтов из монтажного комплекта</li>
+          <li>Подключите бачок к водопроводу с помощью гибкой подводки</li>
+          <li>Установите и подключите сливной механизм в бачке</li>
+          <li>Проверьте работу унитаза и отсутствие протечек</li>
+        </ol>
+        
+        <div class="info-box">
+          <div class="info-title">Важные замечания:</div>
+          <p>Используйте специальную манжету для герметизации стыка с канализацией</p>
+          <p>Не перетягивайте крепежные болты, чтобы не треснул унитаз</p>
+          <p>Проверьте уровень унитаза, чтобы он стоял ровно</p>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 25px 0 10px;">Установка смесителя</h2>
+        
+        <div class="info-box">
+          <div class="info-title">Необходимые инструменты:</div>
+          <p>Разводной ключ</p>
+          <p>ФУМ-лента</p>
+          <p>Силиконовый герметик</p>
+          <p>Гибкая подводка</p>
+        </div>
+        
+        <h3 style="color: #4CAF50; margin: 20px 0 10px; text-align: left;">Пошаговая инструкция:</h3>
+        <ol style="text-align: left; padding-left: 20px; margin-bottom: 20px; line-height: 1.5;">
+          <li>Перекройте воду на стояках холодной и горячей воды</li>
+          <li>Снимите старый смеситель, если он есть</li>
+          <li>Очистите резьбу на подводках от старой ленты и загрязнений</li>
+          <li>Намотайте ФУМ-ленту на резьбу подводок (5-6 витков)</li>
+          <li>Установите новый смеситель на раковину или ванну</li>
+          <li>Подключите гибкие подводки к смесителю и водопроводу</li>
+          <li>Проверьте герметичность соединений</li>
+          <li>Включите воду и проверьте работу смесителя</li>
+        </ol>
+        
+        <div class="info-box">
+          <div class="info-title">Важные замечания:</div>
+          <p>ФУМ-лента наматывается по часовой стрелке</p>
+          <p>Не перетягивайте соединения, чтобы не повредить резьбу</p>
+          <p>Проверьте работу смесителя при разных температурах</p>
+        </div>
+        
+        <h2 style="color: #4CAF50; margin: 25px 0 10px;">Устранение распространенных проблем</h2>
+        
+        <div class="info-box">
+          <div class="info-title">Протечка в соединениях:</div>
+          <p>Затяните соединение, но не перетягивайте. Если протечка продолжается, замените прокладку или ФУМ-ленту.</p>
+        </div>
+        
+        <div class="info-box">
+          <div class="info-title">Слабый напор воды:</div>
+          <p>Проверьте фильтры на входе в смеситель, при необходимости промойте или замените их.</p>
+        </div>
+        
+        <div class="info-box">
+          <div class="info-title">Течь из-под унитаза:</div>
+          <p>Вероятно, повреждена манжета. Перекройте воду, опорожните бачок, замените манжету.</p>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('training')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Создаем мерцающие звезды
+    function createStars() {
+      const starsContainer = document.getElementById('stars');
+      const starCount = 80;
+      
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        
+        // Случайные параметры для звезд
+        const size = Math.random() * 2.5;
+        const posX = Math.random() * 100;
+        const posY = Math.random() * 100;
+        const delay = Math.random() * 4;
+        const duration = 2 + Math.random() * 4;
+        
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${posX}%`;
+        star.style.top = `${posY}%`;
+        star.style.animationDelay = `${delay}s`;
+        star.style.animationDuration = `${duration}s`;
+        
+        starsContainer.appendChild(star);
+      }
+    }
+    
+    // Функция для переключения между разделами
+    function showSection(sectionId) {
+      // Скрыть все разделы
+      document.querySelectorAll('.page').forEach(section => {
+        section.classList.add('hidden');
+      });
+      
+      // Показать нужный раздел
+      document.getElementById(sectionId).classList.remove('hidden');
+      
+      // Прокрутка вверх
+      window.scrollTo(0, 0);
+      
+      // Если это раздел сметы, пересчитать
+      if (sectionId === 'estimate') {
+        calculateEstimate();
+      }
+    }
+    
+    // Добавить строку в таблицу материалов
+    function addMaterialRow() {
+      const table = document.getElementById('materials-table').getElementsByTagName('tbody')[0];
+      const rowCount = table.rows.length + 1;
+      
+      const row = table.insertRow();
+      
+      const cell1 = row.insertCell(0);
+      const cell2 = row.insertCell(1);
+      const cell3 = row.insertCell(2);
+      const cell4 = row.insertCell(3);
+      const cell5 = row.insertCell(4);
+      
+      cell1.innerHTML = rowCount;
+      cell2.innerHTML = '<input type="text" class="input-field" style="width: 100%; padding: 5px;" value="" />';
+      cell3.innerHTML = '<input type="number" class="input-field" style="width: 100%; padding: 5px;" value="1" oninput="updateMaterialTotal(this)" />';
+      cell4.innerHTML = '<input type="number" class="input-field" style="width: 100%; padding: 5px;" value="0" oninput="updateMaterialTotal(this)" />';
+      cell5.className = 'material-total';
+      cell5.innerHTML = '0';
+      
+      // Обновляем общую смету
+      calculateEstimate();
+    }
+    
+    // Обновить сумму для материала
+    function updateMaterialTotal(input) {
+      const row = input.closest('tr');
+      const quantity = parseFloat(row.cells[2].querySelector('input').value) || 0;
+      const price = parseFloat(row.cells[3].querySelector('input').value) || 0;
+      const total = quantity * price;
+      
+      row.cells[4].textContent = total.toFixed(0);
+      
+      // Обновляем общую смету
+      calculateEstimate();
+    }
+    
+    // Рассчитать смету
+    function calculateEstimate() {
+      // Считаем стоимость материалов
+      let totalMaterials = 0;
+      const materialRows = document.querySelectorAll('#materials-table tbody tr');
+      
+      materialRows.forEach(row => {
+        const quantity = parseFloat(row.cells[2].querySelector('input').value) || 0;
+        const price = parseFloat(row.cells[3].querySelector('input').value) || 0;
+        totalMaterials += quantity * price;
+      });
+      
+      // Накладные расходы
+      const overheadPercent = parseFloat(document.getElementById('estimate-overhead').value) || 0;
+      const overhead = totalMaterials * (overheadPercent / 100);
+      
+      // Аренда техники
+      const equipment = parseFloat(document.getElementById('estimate-equipment').value) || 0;
+      
+      // Оплата труда
+      const labor = parseFloat(document.getElementById('estimate-labor').value) || 0;
+      
+      // Прочие расходы
+      const other = parseFloat(document.getElementById('estimate-other').value) || 0;
+      
+      // Итого
+      const totalEstimate = totalMaterials + overhead + equipment + labor + other;
+      
+      // Обновляем отображение
+      document.getElementById('total-materials').textContent = totalMaterials.toFixed(0);
+      document.getElementById('total-overhead').textContent = overhead.toFixed(0);
+      document.getElementById('total-equipment').textContent = equipment.toFixed(0);
+      document.getElementById('total-labor').textContent = labor.toFixed(0);
+      document.getElementById('total-other').textContent = other.toFixed(0);
+      document.getElementById('total-estimate').textContent = totalEstimate.toFixed(0);
+    }
+    
+    // Сформировать PDF
+    function generatePDF() {
+      const projectName = document.getElementById('estimate-project-name').value;
+      const totalEstimate = document.getElementById('total-estimate').textContent;
+      
+      // В реальном приложении здесь был бы код для генерации PDF
+      alert(`Смета "${projectName}" успешно сформирована!\nОбщая стоимость: ${totalEstimate} руб.\n\nВ реальном приложении смета была бы сохранена в PDF-формате.`);
+    }
+    
+    // Сохранить смету
+    function saveEstimate() {
+      const projectName = document.getElementById('estimate-project-name').value;
+      
+      // В реальном приложении здесь был бы код для сохранения сметы
+      alert(`Смета "${projectName}" успешно сохранена!\n\nВ реальном приложении смета была бы сохранена в базе данных.`);
+    }
+    
+    // Скачать документ
+    function downloadDocument(docType) {
+      let fileName, fileType;
+      
+      switch(docType) {
+        case 'act_work':
+          fileName = 'Акт_выполненных_работ_КС-2.docx';
+          fileType = 'DOCX';
+          break;
+        case 'act_cost':
+          fileName = 'Справка_о_стоимости_работ_КС-3.xlsx';
+          fileType = 'XLSX';
+          break;
+        case 'act_acceptance':
+          fileName = 'Акт_приемки_работ.docx';
+          fileType = 'DOCX';
+          break;
+        case 'contract_work':
+          fileName = 'Договор_подряда_на_строительные_работы.docx';
+          fileType = 'DOCX';
+          break;
+        case 'contract_supply':
+          fileName = 'Договор_поставки_материалов.docx';
+          fileType = 'DOCX';
+          break;
+        case 'contract_general':
+          fileName = 'Генеральный_подрядный_договор.docx';
+          fileType = 'DOCX';
+          break;
+        case 'invoice':
+          fileName = 'Счет-фактура.xlsx';
+          fileType = 'XLSX';
+          break;
+        case 'waybill':
+          fileName = 'Товарная_накладная_ТОРГ-12.xlsx';
+          fileType = 'XLSX';
+          break;
+        case 'specification':
+          fileName = 'Спецификация_к_договору.xlsx';
+          fileType = 'XLSX';
+          break;
+        case 'estimate_form':
+          fileName = 'Смета_в_формате_Excel.xlsx';
+          fileType = 'XLSX';
+          break;
+        case 'estimate_gesn':
+          fileName = 'Смета_по_ГЭСН.xlsx';
+          fileType = 'XLSX';
+          break;
+        case 'estimate_fer':
+          fileName = 'Смета_по_ФЕР.xlsx';
+          fileType = 'XLSX';
+          break;
+        default:
+          fileName = 'Документ.docx';
+          fileType = 'DOCX';
+      }
+      
+      // В реальном приложении здесь был бы код для скачивания файла
+      alert(`Файл "${fileName}" успешно загружен!\n\nВ реальном приложении вы бы получили редактируемый файл в формате ${fileType}.`);
+    }
+    
+    // Показать обучающий материал
+    function showTraining(trainingId) {
+      // Скрыть все разделы
+      document.querySelectorAll('.page').forEach(section => {
+        section.classList.add('hidden');
+      });
+      
+      // Показать нужный раздел
+      document.getElementById(`training-${trainingId}`).classList.remove('hidden');
+      
+      // Прокрутка вверх
+      window.scrollTo(0, 0);
+      
+      // Если это раздел приготовления растворов, пересчитать
+      if (trainingId === 'mix-preparation') {
+        calculateMixPreparation();
+      }
+    }
+    
+    // Рассчитать пропорции для растворов
+    function calculateMixPreparation() {
+      // Цементный раствор
+      const cementVolume = parseFloat(document.getElementById('mix-cement-volume').value) || 0.1;
+      const cement = cementVolume * 2400 * (1/4); // 1 часть цемента из 4
+      const sand = cementVolume * 2400 * (3/4); // 3 части песка из 4
+      const water = cement * 0.4; // 0.4 части воды
+      
+      document.getElementById('mix-cement-result').innerHTML = `
+        <p><strong>Цемент М400:</strong> ${cement.toFixed(0)} кг</p>
+        <p><strong>Песок:</strong> ${sand.toFixed(0)} кг</p>
+        <p><strong>Вода:</strong> ${water.toFixed(0)} л</p>
+      `;
+      
+      // Гипсовый раствор
+      const gypsumVolume = parseFloat(document.getElementById('mix-gypsum-volume').value) || 0.05;
+      const gypsum = gypsumVolume * 1300; // Плотность гипса ~1300 кг/м³
+      const gypsumWater = gypsum * 0.6; // 0.6 части воды
+      
+      document.getElementById('mix-gypsum-result').innerHTML = `
+        <p><strong>Гипс:</strong> ${gypsum.toFixed(0)} кг</p>
+        <p><strong>Вода:</strong> ${gypsumWater.toFixed(0)} л</p>
+      `;
+    }
+    
+    // Функция для инициализации приложения
+    function initApp() {
+      createStars();
+      
+      // Добавляем обработчик для полей ввода в смете
+      document.querySelectorAll('#materials-table input[type="number"]').forEach(input => {
+        input.addEventListener('input', function() {
+          updateMaterialTotal(this);
+        });
+      });
+      
+      // Показываем главное меню по умолчанию
+      showSection('main-menu');
+      
+      // Плавная прокрутка
+      document.querySelectorAll('.submenu, .calculator-container').forEach(container => {
+        container.addEventListener('touchstart', function(e) {
+          this.startY = e.touches[0].clientY;
+        });
+        
+        container.addEventListener('touchmove', function(e) {
+          if (!this.startY) return;
+          
+          const deltaY = e.touches[0].clientY - this.startY;
+          this.scrollTop -= deltaY;
+          this.startY = e.touches[0].clientY;
+          e.preventDefault();
+        });
+      });
+    }
+    
+    // Инициализация при загрузке страницы
+    window.onload = initApp;
+  </script>
+</body>
+</html>

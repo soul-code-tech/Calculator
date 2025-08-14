@@ -1,0 +1,3283 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Строительные материалы - Инженерный калькулятор</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #e0e0e0;
+      text-align: center;
+      min-height: 100vh;
+      padding: 15px;
+      position: relative;
+      overflow: hidden;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Эффект мерцающих звезд в фоне */
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .star {
+      position: absolute;
+      background: #ffffff;
+      border-radius: 50%;
+      animation: twinkle 3s infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.8; }
+    }
+
+    .page {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .container {
+      max-width: 100%;
+      margin: 15px auto;
+      padding: 20px 15px;
+      background: rgba(15, 25, 35, 0.85);
+      border: 2px solid #4CAF50;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
+      position: relative;
+      overflow: hidden;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+    }
+
+    .container::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: #4CAF50;
+      font-size: 1.8em;
+      text-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+      margin-bottom: 15px;
+      position: relative;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    h1::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+      margin: 10px auto;
+    }
+
+    .subtitle {
+      font-size: 1.1em;
+      color: #b0bec5;
+      margin-bottom: 20px;
+      font-weight: 300;
+      line-height: 1.4;
+    }
+
+    .submenu {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin: 20px 0;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #4CAF50 rgba(30, 40, 50, 0.7);
+    }
+
+    .submenu::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .submenu::-webkit-scrollbar-track {
+      background: rgba(30, 40, 50, 0.5);
+      border-radius: 4px;
+    }
+
+    .submenu::-webkit-scrollbar-thumb {
+      background: #4CAF50;
+      border-radius: 4px;
+    }
+
+    .submenu::-webkit-scrollbar-thumb:hover {
+      background: #8BC34A;
+    }
+
+    .submenu-item {
+      background: rgba(30, 40, 50, 0.7);
+      border: 1px solid #4CAF50;
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .submenu-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+      background: rgba(40, 50, 60, 0.8);
+    }
+
+    .submenu-item::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px;
+      height: 100%;
+      background: #4CAF50;
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+    }
+
+    .submenu-item:hover::before {
+      transform: scaleY(1);
+    }
+
+    .submenu-icon {
+      font-size: 2.2em;
+      width: 50px;
+      text-align: center;
+      color: #4CAF50;
+      transition: all 0.3s ease;
+    }
+
+    .submenu-item:hover .submenu-icon {
+      transform: scale(1.2);
+    }
+
+    .submenu-title {
+      font-family: 'Orbitron', sans-serif;
+      color: #4CAF50;
+      font-size: 1.3em;
+      margin-bottom: 8px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .submenu-description {
+      color: #b0bec5;
+      font-size: 1em;
+      line-height: 1.4;
+      font-weight: 300;
+    }
+
+    .calculator-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px 0;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #4CAF50 rgba(30, 40, 50, 0.7);
+    }
+
+    .calculator-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .calculator-container::-webkit-scrollbar-track {
+      background: rgba(30, 40, 50, 0.5);
+      border-radius: 4px;
+    }
+
+    .calculator-container::-webkit-scrollbar-thumb {
+      background: #4CAF50;
+      border-radius: 4px;
+    }
+
+    .calculator-container::-webkit-scrollbar-thumb:hover {
+      background: #8BC34A;
+    }
+
+    .input-group {
+      width: 100%;
+      max-width: 300px;
+      margin: 15px 0;
+    }
+
+    .input-label {
+      display: block;
+      text-align: left;
+      margin-bottom: 6px;
+      color: #4CAF50;
+      font-weight: 500;
+      font-size: 1.05em;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      background: rgba(30, 40, 50, 0.7);
+      border: 1px solid #4CAF50;
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-family: 'Roboto', sans-serif;
+      font-size: 1.1em;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #8BC34A;
+      box-shadow: 0 0 8px rgba(139, 195, 74, 0.3);
+    }
+
+    .btn-calculator {
+      background: #4CAF50;
+      color: #0d2a17;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-family: 'Roboto', sans-serif;
+      font-size: 1.1em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 15px 0;
+      width: 100%;
+      max-width: 300px;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    }
+
+    .btn-calculator:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 15px rgba(76, 175, 80, 0.7);
+    }
+
+    .result-container {
+      background: rgba(30, 40, 50, 0.7);
+      border: 1px solid #4CAF50;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 20px 0;
+      width: 100%;
+      max-width: 300px;
+      text-align: left;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+      display: none;
+    }
+
+    .result-title {
+      font-family: 'Orbitron', sans-serif;
+      color: #4CAF50;
+      font-size: 1.4em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .result-text {
+      color: #e0e0e0;
+      line-height: 1.5;
+      font-size: 1.05em;
+    }
+
+    .info-box {
+      background: rgba(30, 40, 50, 0.5);
+      border: 1px solid #4CAF50;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 15px 0;
+      text-align: left;
+      font-size: 0.95em;
+      line-height: 1.4;
+    }
+
+    .info-title {
+      color: #4CAF50;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .nav-buttons {
+      margin: 20px auto 10px;
+      display: flex;
+      justify-content: space-between;
+      max-width: 100%;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn-back, .btn-home {
+      display: inline-block;
+      padding: 12px 20px;
+      background: rgba(76, 175, 80, 0.25);
+      color: #4CAF50;
+      text-decoration: none;
+      border: 1px solid #4CAF50;
+      border-radius: 10px;
+      font-size: 1.1em;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+      min-width: 120px;
+      flex: 1;
+    }
+
+    .btn-back:hover, .btn-home:hover {
+      background: rgba(76, 175, 80, 0.4);
+      transform: scale(1.03);
+      box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Адаптация для мобильных устройств */
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px 10px;
+        border-radius: 16px;
+      }
+      
+      .input-field {
+        font-size: 1.05em;
+      }
+      
+      .btn-calculator {
+        font-size: 1.05em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  
+  <div class="container">
+    <!-- Главное меню строительных материалов -->
+    <div id="main-menu" class="page">
+      <h1>🏗️ Строительные материалы</h1>
+      <p class="subtitle">Профессиональные расчеты по ГОСТ, СП и СНиП</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация:</div>
+        <p>Все расчеты выполняются по действующим нормативным документам РФ</p>
+        <p>СП 22.13330.2016 (Актуализированная редакция СНиП 3.03.01-87)</p>
+      </div>
+      
+      <div class="submenu">
+        <div class="submenu-item" onclick="showSection('foundation')">
+          <div class="submenu-icon">🧱</div>
+          <div>
+            <div class="submenu-title">Расчет фундамента</div>
+            <div class="submenu-description">Ленточный, свайный, блоки ФБС</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('walls')">
+          <div class="submenu-icon">🧱</div>
+          <div>
+            <div class="submenu-title">Расчет стен</div>
+            <div class="submenu-description">Материалы, окна, двери, утепление, нагрузка на фундамент</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('roof')">
+          <div class="submenu-icon">🏠</div>
+          <div>
+            <div class="submenu-title">Расчет кровли</div>
+            <div class="submenu-description">Односкатная, двухскатная, многоскатная, снеговая и дождевая нагрузка</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('facade')">
+          <div class="submenu-icon">🎨</div>
+          <div>
+            <div class="submenu-title">Фасадные работы</div>
+            <div class="submenu-description">Металлосайдинг, облицовочный кирпич, алюкобонд</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('finish')">
+          <div class="submenu-icon">✨</div>
+          <div>
+            <div class="submenu-title">Отделочные работы</div>
+            <div class="submenu-description">Гипсокартон, штукатурка, обои, плитка, ламинат</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('fence')">
+          <div class="submenu-icon">🔩</div>
+          <div>
+            <div class="submenu-title">Расчет забора</div>
+            <div class="submenu-description">Профлист, кирпич, профильная труба, фундамент</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="index.html" class="btn-back">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Расчет фундамента -->
+    <div id="foundation" class="page hidden">
+      <h1>🧱 Расчет фундамента</h1>
+      <p class="subtitle">Расчет материалов по СП 22.13330.2016</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Расчет производится по СП 22.13330.2016 (Актуализированная редакция СНиП 3.03.01-87)</p>
+        <p>Учитывается тип фундамента и геологические условия</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Тип фундамента:</label>
+          <select class="input-field" id="foundation-type" onchange="toggleFoundationFields()">
+            <option value="strip">Ленточный</option>
+            <option value="pile">Свайный</option>
+            <option value="fb">Блоки ФБС</option>
+          </select>
+        </div>
+        
+        <div id="strip-foundation-fields">
+          <div class="input-group">
+            <label class="input-label">Длина фундамента (м):</label>
+            <input type="number" class="input-field" id="strip-length" placeholder="Введите длину" value="10">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Ширина фундамента (м):</label>
+            <input type="number" class="input-field" id="strip-width" placeholder="Введите ширину" value="0.4">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Глубина залегания (м):</label>
+            <input type="number" class="input-field" id="strip-depth" placeholder="Введите глубину" value="1.5">
+          </div>
+        </div>
+        
+        <div id="pile-foundation-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Тип сваи:</label>
+            <select class="input-field" id="pile-type">
+              <option value="concrete">Железобетонная</option>
+              <option value="helical">Винтовая</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Длина сваи (м):</label>
+            <input type="number" class="input-field" id="pile-length" placeholder="Введите длину" value="3">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Диаметр сваи (мм):</label>
+            <input type="number" class="input-field" id="pile-diameter" placeholder="Введите диаметр" value="300">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Длина здания (м):</label>
+            <input type="number" class="input-field" id="pile-building-length" placeholder="Введите длину" value="10">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Ширина здания (м):</label>
+            <input type="number" class="input-field" id="pile-building-width" placeholder="Введите ширину" value="8">
+          </div>
+        </div>
+        
+        <div id="fb-foundation-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Тип блоков ФБС:</label>
+            <select class="input-field" id="fb-type">
+              <option value="standard">Стандартные</option>
+              <option value="heavy">Тяжелые</option>
+              <option value="light">Легкие</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Количество блоков:</label>
+            <input type="number" class="input-field" id="fb-count" placeholder="Введите количество" value="20">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Размер блока (м):</label>
+            <select class="input-field" id="fb-size">
+              <option value="0.6x0.3x0.22">ФБС 6-3-2 (0.6×0.3×0.22 м)</option>
+              <option value="0.9x0.3x0.22">ФБС 9-3-2 (0.9×0.3×0.22 м)</option>
+              <option value="1.2x0.3x0.22">ФБС 12-3-2 (1.2×0.3×0.22 м)</option>
+              <option value="2.4x0.3x0.5">ФБС 24-3-5 (2.4×0.3×0.5 м)</option>
+            </select>
+          </div>
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateFoundation()">
+          Рассчитать материалы
+        </button>
+        
+        <div class="result-container" id="foundation-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="foundation-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Расчет стен -->
+    <div id="walls" class="page hidden">
+      <h1>🧱 Расчет стен</h1>
+      <p class="subtitle">Расчет материалов по СП 2.13330.2016</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Расчет производится по СП 2.13330.2016 (Актуализированная редакция СНиП 3.03.01-87)</p>
+        <p>Учитывается материал, этажность, окна и двери, нагрузка на фундамент</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Материал стен:</label>
+          <select class="input-field" id="wall-material" onchange="updateWallThickness()">
+            <option value="brick">Кирпич рядовой</option>
+            <option value="timber">Брус</option>
+            <option value="half-timber">Полубрус</option>
+            <option value="concrete-block">Шлакоблок</option>
+            <option value="foam-concrete">Пенобетон</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Этажность:</label>
+          <input type="number" class="input-field" id="wall-floors" placeholder="Введите этажность" value="2">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Длина здания (м):</label>
+          <input type="number" class="input-field" id="wall-length" placeholder="Введите длину" value="10">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Ширина здания (м):</label>
+          <input type="number" class="input-field" id="wall-width" placeholder="Введите ширину" value="8">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Высота этажа (м):</label>
+          <input type="number" class="input-field" id="wall-floor-height" placeholder="Введите высоту" value="3">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Толщина стены:</label>
+          <select class="input-field" id="wall-thickness">
+            <option value="0.25">0.5 кирпича (0.25 м)</option>
+            <option value="0.38">1 кирпич (0.38 м)</option>
+            <option value="0.51">1.5 кирпича (0.51 м)</option>
+            <option value="0.64">2 кирпича (0.64 м)</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Количество окон:</label>
+          <input type="number" class="input-field" id="wall-windows" placeholder="Введите количество" value="6">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Размер окон (м):</label>
+          <input type="text" class="input-field" id="wall-window-size" placeholder="Ширина x Высота" value="1.5x1.5">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Количество дверей:</label>
+          <input type="number" class="input-field" id="wall-doors" placeholder="Введите количество" value="2">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Размер дверей (м):</label>
+          <input type="text" class="input-field" id="wall-door-size" placeholder="Ширина x Высота" value="0.9x2.1">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Требуется армопояс:</label>
+          <select class="input-field" id="wall-armor-belt">
+            <option value="yes">Да</option>
+            <option value="no">Нет</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Тип грунта:</label>
+          <select class="input-field" id="wall-soil-type">
+            <option value="clay">Глина</option>
+            <option value="silt">Суглинок</option>
+            <option value="sand">Песок</option>
+            <option value="rock">Скальный грунт</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Площадь дома (м²):</label>
+          <input type="number" class="input-field" id="wall-house-area" placeholder="Введите площадь" value="80">
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateWalls()">
+          Рассчитать материалы
+        </button>
+        
+        <div class="result-container" id="walls-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="walls-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Расчет кровли -->
+    <div id="roof" class="page hidden">
+      <h1>🏠 Расчет кровли</h1>
+      <p class="subtitle">Расчет материалов по СП 20.13330.2016</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Расчет производится по СП 20.13330.2016 (Актуализированная редакция СНиП 2.01.07-85)</p>
+        <p>Учитывается тип кровли, материалы и конструкция, снеговая и дождевая нагрузка</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Тип кровли:</label>
+          <select class="input-field" id="roof-type" onchange="toggleRoofFields()">
+            <option value="single">Односкатная</option>
+            <option value="double">Двухскатная</option>
+            <option value="multi">Многоскатная</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Длина здания (м):</label>
+          <input type="number" class="input-field" id="roof-length" placeholder="Введите длину" value="10">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Ширина здания (м):</label>
+          <input type="number" class="input-field" id="roof-width" placeholder="Введите ширину" value="8">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Угол наклона (град):</label>
+          <input type="number" class="input-field" id="roof-angle" placeholder="Введите угол" value="30">
+        </div>
+        
+        <div id="multi-roof-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Количество дополнительных скатов:</label>
+            <input type="number" class="input-field" id="roof-additional-slopes" placeholder="Введите количество" value="2">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Количество мансардных окон:</label>
+            <input type="number" class="input-field" id="roof-windows" placeholder="Введите количество" value="2">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Количество дымоходов:</label>
+            <input type="number" class="input-field" id="roof-chimneys" placeholder="Введите количество" value="1">
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Снеговой район:</label>
+          <select class="input-field" id="roof-snow-region">
+            <option value="1">I снеговой район</option>
+            <option value="2">II снеговой район</option>
+            <option value="3">III снеговой район</option>
+            <option value="4">IV снеговой район</option>
+            <option value="5">V снеговой район</option>
+            <option value="6">VI снеговой район</option>
+            <option value="7">VII снеговой район</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Ветровой район:</label>
+          <select class="input-field" id="roof-wind-region">
+            <option value="1">I ветровой район</option>
+            <option value="2">II ветровой район</option>
+            <option value="3">III ветровой район</option>
+            <option value="4">IV ветровой район</option>
+            <option value="5">V ветровой район</option>
+            <option value="6">VI ветровой район</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Тип кровельного материала:</label>
+          <select class="input-field" id="roof-material">
+            <option value="ondulin">Ондулин</option>
+            <option value="metal-tile">Металлочерепица</option>
+            <option value="soft-tile">Гибкая черепица</option>
+            <option value="profile-sheet">Профнастил</option>
+            <option value="ceramic-tile">Керамическая черепица</option>
+          </select>
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateRoof()">
+          Рассчитать материалы
+        </button>
+        
+        <div class="result-container" id="roof-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="roof-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Расчет фасада -->
+    <div id="facade" class="page hidden">
+      <h1>🎨 Фасадные работы</h1>
+      <p class="subtitle">Расчет материалов по СП 2.13330.2016</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Расчет производится по СП 2.13330.2016 (Актуализированная редакция СНиП 3.03.01-87)</p>
+        <p>Учитывается материал фасада и конструкция обрешетки</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Тип фасада:</label>
+          <select class="input-field" id="facade-type">
+            <option value="siding">Металлосайдинг</option>
+            <option value="brick">Облицовочный кирпич</option>
+            <option value="alucobond">Алюкобонд</option>
+            <option value="plaster">Штукатурный фасад</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Длина здания (м):</label>
+          <input type="number" class="input-field" id="facade-length" placeholder="Введите длину" value="10">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Ширина здания (м):</label>
+          <input type="number" class="input-field" id="facade-width" placeholder="Введите ширину" value="8">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Высота здания (м):</label>
+          <input type="number" class="input-field" id="facade-height" placeholder="Введите высоту" value="6">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Тип обрешетки:</label>
+          <select class="input-field" id="facade-lattice">
+            <option value="wood">Деревянная</option>
+            <option value="metal">Металлическая</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Шаг обрешетки (мм):</label>
+          <input type="number" class="input-field" id="facade-lattice-step" placeholder="Введите шаг" value="400">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Требуется утепление:</label>
+          <select class="input-field" id="facade-insulation">
+            <option value="yes">Да</option>
+            <option value="no">Нет</option>
+          </select>
+        </div>
+        
+        <div class="input-group" id="insulation-thickness-group" style="display: none;">
+          <label class="input-label">Толщина утеплителя (мм):</label>
+          <select class="input-field" id="facade-insulation-thickness">
+            <option value="50">50 мм</option>
+            <option value="100">100 мм</option>
+            <option value="150">150 мм</option>
+          </select>
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateFacade()">
+          Рассчитать материалы
+        </button>
+        
+        <div class="result-container" id="facade-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="facade-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Отделочные работы -->
+    <div id="finish" class="page hidden">
+      <h1>✨ Отделочные работы</h1>
+      <p class="subtitle">Расчет материалов по СП 2.13330.2016</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Расчет производится по СП 2.13330.2016 (Актуализированная редакция СНиП 3.03.01-87)</p>
+        <p>Учитывается площадь поверхностей и параметры материалов</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Тип отделки:</label>
+          <select class="input-field" id="finish-type" onchange="toggleFinishFields()">
+            <option value="drywall">Гипсокартон</option>
+            <option value="plaster">Штукатурка</option>
+            <option value="paint">Покраска</option>
+            <option value="wallpaper">Обои</option>
+            <option value="ceiling">Натяжной потолок</option>
+            <option value="baseboard">Плинтуса</option>
+            <option value="tile">Плитка</option>
+            <option value="floor">Пол</option>
+          </select>
+        </div>
+        
+        <!-- Гипсокартон -->
+        <div id="drywall-fields">
+          <div class="input-group">
+            <label class="input-label">Площадь стен (м²):</label>
+            <input type="number" class="input-field" id="drywall-wall-area" placeholder="Введите площадь" value="50">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Площадь потолка (м²):</label>
+            <input type="number" class="input-field" id="drywall-ceiling-area" placeholder="Введите площадь" value="20">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Толщина гипсокартона (мм):</label>
+            <select class="input-field" id="drywall-thickness">
+              <option value="9.5">9.5 мм</option>
+              <option value="12.5">12.5 мм</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип гипсокартона:</label>
+            <select class="input-field" id="drywall-type">
+              <option value="standard">Стандартный</option>
+              <option value="moisture">Влагостойкий</option>
+              <option value="fire">Огнестойкий</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип профиля:</label>
+            <select class="input-field" id="drywall-profile-type">
+              <option value="stoyka">ПН-стоечный (CD)</option>
+              <option value="naprav">ПН-направляющий (UD)</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Штукатурка -->
+        <div id="plaster-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Площадь стен (м²):</label>
+            <input type="number" class="input-field" id="plaster-wall-area" placeholder="Введите площадь" value="50">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Площадь потолка (м²):</label>
+            <input type="number" class="input-field" id="plaster-ceiling-area" placeholder="Введите площадь" value="20">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Толщина штукатурки (мм):</label>
+            <select class="input-field" id="plaster-thickness">
+              <option value="10">10 мм</option>
+              <option value="15">15 мм</option>
+              <option value="20">20 мм</option>
+              <option value="25">25 мм</option>
+              <option value="30">30 мм</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип штукатурки:</label>
+            <select class="input-field" id="plaster-type">
+              <option value="cement">Цементно-песчаная</option>
+              <option value="gypsum">Гипсовая</option>
+              <option value="lime">Известковая</option>
+              <option value="clay">Глиняная</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Требуется армирование:</label>
+            <select class="input-field" id="plaster-reinforcement">
+              <option value="yes">Да</option>
+              <option value="no">Нет</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Покраска -->
+        <div id="paint-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Площадь стен (м²):</label>
+            <input type="number" class="input-field" id="paint-wall-area" placeholder="Введите площадь" value="50">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Площадь потолка (м²):</label>
+            <input type="number" class="input-field" id="paint-ceiling-area" placeholder="Введите площадь" value="20">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Количество слоев:</label>
+            <select class="input-field" id="paint-layers">
+              <option value="1">1 слой</option>
+              <option value="2" selected>2 слоя</option>
+              <option value="3">3 слоя</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип краски:</label>
+            <select class="input-field" id="paint-type">
+              <option value="water">Водоэмульсионная</option>
+              <option value="acrylic">Акриловая</option>
+              <option value="latex">Латексная</option>
+              <option value="silicone">Силиконовая</option>
+              <option value="silicate">Силикатная</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Расход краски (мл/м²):</label>
+            <input type="number" class="input-field" id="paint-consumption" placeholder="Введите расход" value="120">
+          </div>
+        </div>
+        
+        <!-- Обои -->
+        <div id="wallpaper-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Площадь стен (м²):</label>
+            <input type="number" class="input-field" id="wallpaper-area" placeholder="Введите площадь" value="50">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Ширина обоев (м):</label>
+            <select class="input-field" id="wallpaper-width">
+              <option value="0.53">0.53 м</option>
+              <option value="0.7">0.7 м</option>
+              <option value="1.06">1.06 м</option>
+              <option value="1.2">1.2 м</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Длина рулона (м):</label>
+            <select class="input-field" id="wallpaper-length">
+              <option value="10">10 м</option>
+              <option value="15">15 м</option>
+              <option value="20">20 м</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Плотность обоев (г/м²):</label>
+            <select class="input-field" id="wallpaper-density">
+              <option value="80">80 г/м²</option>
+              <option value="100">100 г/м²</option>
+              <option value="120">120 г/м²</option>
+              <option value="150">150 г/м²</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип обоев:</label>
+            <select class="input-field" id="wallpaper-type">
+              <option value="paper">Бумажные</option>
+              <option value="vinyl">Виниловые</option>
+              <option value="non-woven">Флизелиновые</option>
+              <option value="textile">Текстильные</option>
+              <option value="liquid">Жидкие</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Требуется подгоночный рисунок:</label>
+            <select class="input-field" id="wallpaper-pattern">
+              <option value="yes">Да</option>
+              <option value="no" selected>Нет</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Натяжной потолок -->
+        <div id="ceiling-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Площадь потолка (м²):</label>
+            <input type="number" class="input-field" id="ceiling-area" placeholder="Введите площадь" value="20">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип потолка:</label>
+            <select class="input-field" id="ceiling-type">
+              <option value="matte">Матовый</option>
+              <option value="satin">Сатиновый</option>
+              <option value="glossy">Глянцевый</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Цвет потолка:</label>
+            <select class="input-field" id="ceiling-color">
+              <option value="white">Белый</option>
+              <option value="beige">Бежевый</option>
+              <option value="gray">Серый</option>
+              <option value="black">Черный</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Количество уровней:</label>
+            <select class="input-field" id="ceiling-levels">
+              <option value="1" selected>1 уровень</option>
+              <option value="2">2 уровня</option>
+              <option value="3">3 уровня</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Форма потолка:</label>
+            <select class="input-field" id="ceiling-shape">
+              <option value="square">Прямоугольная</option>
+              <option value="round">Круглая</option>
+              <option value="complex">Сложная</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Плинтуса -->
+        <div id="baseboard-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Длина стен (м):</label>
+            <input type="number" class="input-field" id="baseboard-length" placeholder="Введите длину" value="40">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип плинтуса:</label>
+            <select class="input-field" id="baseboard-type">
+              <option value="floor">Напольный</option>
+              <option value="ceiling">Потолочный</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Материал плинтуса:</label>
+            <select class="input-field" id="baseboard-material">
+              <option value="wood">Деревянный</option>
+              <option value="mdf">МДФ</option>
+              <option value="plastic">Пластиковый</option>
+              <option value="polyurethane">Полиуретановый</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Длина планки (м):</label>
+            <select class="input-field" id="baseboard-strip-length">
+              <option value="2">2 м</option>
+              <option value="2.5">2.5 м</option>
+              <option value="3" selected>3 м</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Требуются уголки:</label>
+            <select class="input-field" id="baseboard-corners">
+              <option value="yes">Да</option>
+              <option value="no" selected>Нет</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Плитка -->
+        <div id="tile-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Площадь стен (м²):</label>
+            <input type="number" class="input-field" id="tile-area" placeholder="Введите площадь" value="20">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Размер плитки (мм):</label>
+            <select class="input-field" id="tile-size">
+              <option value="200x300">200×300</option>
+              <option value="250x400">250×400</option>
+              <option value="300x600">300×600</option>
+              <option value="600x600">600×600</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Ширина шва (мм):</label>
+            <select class="input-field" id="tile-joint-width">
+              <option value="1.5">1.5 мм</option>
+              <option value="2">2 мм</option>
+              <option value="3" selected>3 мм</option>
+              <option value="4">4 мм</option>
+              <option value="5">5 мм</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип плитки:</label>
+            <select class="input-field" id="tile-type">
+              <option value="ceramic">Керамическая</option>
+              <option value="porcelain">Керамогранит</option>
+              <option value="glass">Стеклянная</option>
+              <option value="mosaic">Мозаика</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип укладки:</label>
+            <select class="input-field" id="tile-layout">
+              <option value="straight">Прямая</option>
+              <option value="diagonal">Диагональная</option>
+              <option value="brick">Кирпичная</option>
+              <option value="herringbone">Елочкой</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Пол -->
+        <div id="floor-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Площадь пола (м²):</label>
+            <input type="number" class="input-field" id="floor-area" placeholder="Введите площадь" value="20">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип напольного покрытия:</label>
+            <select class="input-field" id="floor-type" onchange="toggleFloorType()">
+              <option value="laminate">Ламинат</option>
+              <option value="ceramic-tile">Керамогранит</option>
+              <option value="parquet">Паркет</option>
+              <option value="linoleum">Линолеум</option>
+            </select>
+          </div>
+          
+          <div id="laminate-fields">
+            <div class="input-group">
+              <label class="input-label">Размер ламината (мм):</label>
+              <select class="input-field" id="laminate-size">
+                <option value="1215x195">1215×195</option>
+                <option value="1215x240">1215×240</option>
+                <option value="1292x194">1292×194</option>
+                <option value="1380x197">1380×197</option>
+              </select>
+            </div>
+            
+            <div class="input-group">
+              <label class="input-label">Толщина ламината (мм):</label>
+              <select class="input-field" id="laminate-thickness">
+                <option value="6">6 мм</option>
+                <option value="8">8 мм</option>
+                <option value="10" selected>10 мм</option>
+                <option value="12">12 мм</option>
+              </select>
+            </div>
+            
+            <div class="input-group">
+              <label class="input-label">Класс износостойкости:</label>
+              <select class="input-field" id="laminate-class">
+                <option value="21">21 класс</option>
+                <option value="22">22 класс</option>
+                <option value="23">23 класс</option>
+                <option value="31" selected>31 класс</option>
+                <option value="32">32 класс</option>
+                <option value="33">33 класс</option>
+              </select>
+            </div>
+          </div>
+          
+          <div id="ceramic-tile-fields" class="hidden">
+            <div class="input-group">
+              <label class="input-label">Размер керамогранита (мм):</label>
+              <select class="input-field" id="ceramic-tile-size">
+                <option value="300x300">300×300</option>
+                <option value="400x400">400×400</option>
+                <option value="600x600">600×600</option>
+                <option value="600x1200">600×1200</option>
+              </select>
+            </div>
+            
+            <div class="input-group">
+              <label class="input-label">Толщина керамогранита (мм):</label>
+              <select class="input-field" id="ceramic-tile-thickness">
+                <option value="8">8 мм</option>
+                <option value="10">10 мм</option>
+                <option value="12" selected>12 мм</option>
+              </select>
+            </div>
+          </div>
+          
+          <div id="parquet-fields" class="hidden">
+            <div class="input-group">
+              <label class="input-label">Размер паркета (мм):</label>
+              <select class="input-field" id="parquet-size">
+                <option value="20x60x600">20×60×600</option>
+                <option value="22x70x700">22×70×700</option>
+                <option value="28x90x900">28×90×900</option>
+              </select>
+            </div>
+          </div>
+          
+          <div id="linoleum-fields" class="hidden">
+            <div class="input-group">
+              <label class="input-label">Ширина рулона (м):</label>
+              <select class="input-field" id="linoleum-width">
+                <option value="2">2 м</option>
+                <option value="2.5">2.5 м</option>
+                <option value="3">3 м</option>
+                <option value="3.5">3.5 м</option>
+                <option value="4">4 м</option>
+              </select>
+            </div>
+            
+            <div class="input-group">
+              <label class="input-label">Толщина линолеума (мм):</label>
+              <select class="input-field" id="linoleum-thickness">
+                <option value="1.5">1.5 мм</option>
+                <option value="2">2 мм</option>
+                <option value="2.5">2.5 мм</option>
+                <option value="3">3 мм</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Требуется подложка:</label>
+            <select class="input-field" id="floor-underlayment">
+              <option value="yes">Да</option>
+              <option value="no">Нет</option>
+            </select>
+          </div>
+          
+          <div class="input-group" id="underlayment-type-group" style="display: none;">
+            <label class="input-label">Тип подложки:</label>
+            <select class="input-field" id="floor-underlayment-type">
+              <option value="cork">Пробковая</option>
+              <option value="foam">Пенополиэтилен</option>
+              <option value="jute">Джутовая</option>
+              <option value="felt">Фетровая</option>
+            </select>
+          </div>
+          
+          <div class="input-group" id="underlayment-thickness-group" style="display: none;">
+            <label class="input-label">Толщина подложки (мм):</label>
+            <select class="input-field" id="floor-underlayment-thickness">
+              <option value="2">2 мм</option>
+              <option value="3">3 мм</option>
+              <option value="4">4 мм</option>
+              <option value="5" selected>5 мм</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Требуется клей:</label>
+            <select class="input-field" id="floor-adhesive">
+              <option value="yes">Да</option>
+              <option value="no">Нет</option>
+            </select>
+          </div>
+          
+          <div class="input-group" id="adhesive-type-group" style="display: none;">
+            <label class="input-label">Тип клея:</label>
+            <select class="input-field" id="floor-adhesive-type">
+              <option value="polyurethane">Полиуретановый</option>
+              <option value="dispersion">Дисперсионный</option>
+              <option value="epoxy">Эпоксидный</option>
+            </select>
+          </div>
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateFinish()">
+          Рассчитать материалы
+        </button>
+        
+        <div class="result-container" id="finish-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="finish-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Расчет забора -->
+    <div id="fence" class="page hidden">
+      <h1>🔩 Расчет забора</h1>
+      <p class="subtitle">Расчет материалов по СП 2.13330.2016</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Расчет производится по СП 2.13330.2016 (Актуализированная редакция СНиП 3.03.01-87)</p>
+        <p>Учитывается тип забора, длина, высота и комплектующие</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Тип забора:</label>
+          <select class="input-field" id="fence-type" onchange="toggleFenceFields()">
+            <option value="profile-sheet">Профлист</option>
+            <option value="brick">Кирпич</option>
+            <option value="tube">Профильная труба</option>
+          </select>
+        </div>
+        
+        <!-- Забор из профлиста -->
+        <div id="profile-sheet-fields">
+          <div class="input-group">
+            <label class="input-label">Длина участка (м):</label>
+            <input type="number" class="input-field" id="profile-sheet-length" placeholder="Введите длину" value="50">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Высота забора (м):</label>
+            <select class="input-field" id="profile-sheet-height">
+              <option value="1.5">1.5 м</option>
+              <option value="1.8">1.8 м</option>
+              <option value="2.0" selected>2.0 м</option>
+              <option value="2.2">2.2 м</option>
+              <option value="2.5">2.5 м</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип профлиста:</label>
+            <select class="input-field" id="profile-sheet-type">
+              <option value="c8">C-8</option>
+              <option value="c10">C-10</option>
+              <option value="c20">C-20</option>
+              <option value="c21">C-21</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Толщина профлиста (мм):</label>
+            <select class="input-field" id="profile-sheet-thickness">
+              <option value="0.4">0.4 мм</option>
+              <option value="0.45">0.45 мм</option>
+              <option value="0.5">0.5 мм</option>
+              <option value="0.55">0.55 мм</option>
+              <option value="0.7">0.7 мм</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Шаг столбов (м):</label>
+            <select class="input-field" id="profile-sheet-post-step">
+              <option value="2.5">2.5 м</option>
+              <option value="3" selected>3 м</option>
+              <option value="3.5">3.5 м</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип столбов:</label>
+            <select class="input-field" id="profile-sheet-post-type">
+              <option value="tube">Труба 60×60×2 мм</option>
+              <option value="tube70">Труба 70×70×2 мм</option>
+              <option value="tube80">Труба 80×80×2 мм</option>
+              <option value="tube100">Труба 100×100×2 мм</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Глубина установки столбов (м):</label>
+            <select class="input-field" id="profile-sheet-post-depth">
+              <option value="0.8">0.8 м</option>
+              <option value="1.0" selected>1.0 м</option>
+              <option value="1.2">1.2 м</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Требуются ворота:</label>
+            <select class="input-field" id="profile-sheet-gates">
+              <option value="yes">Да</option>
+              <option value="no" selected>Нет</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Требуется калитка:</label>
+            <select class="input-field" id="profile-sheet-gate">
+              <option value="yes">Да</option>
+              <option value="no" selected>Нет</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Забор из кирпича -->
+        <div id="brick-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Длина участка (м):</label>
+            <input type="number" class="input-field" id="brick-length" placeholder="Введите длину" value="50">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Высота забора (м):</label>
+            <select class="input-field" id="brick-height">
+              <option value="1.5">1.5 м</option>
+              <option value="1.8">1.8 м</option>
+              <option value="2.0" selected>2.0 м</option>
+              <option value="2.2">2.2 м</option>
+              <option value="2.5">2.5 м</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Толщина кладки:</label>
+            <select class="input-field" id="brick-thickness">
+              <option value="0.5">0.5 кирпича (120 мм)</option>
+              <option value="1">1 кирпич (250 мм)</option>
+              <option value="1.5">1.5 кирпича (380 мм)</option>
+              <option value="2">2 кирпича (510 мм)</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип кирпича:</label>
+            <select class="input-field" id="brick-type">
+              <option value="ceramic">Керамический</option>
+              <option value="silicate">Силикатный</option>
+              <option value="clinker">Клинкерный</option>
+              <option value="hollow">Пустотелый</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип фундамента:</label>
+            <select class="input-field" id="brick-foundation-type">
+              <option value="strip">Ленточный</option>
+              <option value="pile">Свайный</option>
+              <option value="slab">Плитный</option>
+            </select>
+          </div>
+          
+          <div id="brick-strip-foundation">
+            <div class="input-group">
+              <label class="input-label">Ширина фундамента (м):</label>
+              <input type="number" class="input-field" id="brick-foundation-width" placeholder="Введите ширину" value="0.4">
+            </div>
+            
+            <div class="input-group">
+              <label class="input-label">Глубина фундамента (м):</label>
+              <input type="number" class="input-field" id="brick-foundation-depth" placeholder="Введите глубину" value="0.6">
+            </div>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Требуются ворота:</label>
+            <select class="input-field" id="brick-gates">
+              <option value="yes">Да</option>
+              <option value="no" selected>Нет</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Требуется калитка:</label>
+            <select class="input-field" id="brick-gate">
+              <option value="yes">Да</option>
+              <option value="no" selected>Нет</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Забор из профильной трубы -->
+        <div id="tube-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Длина участка (м):</label>
+            <input type="number" class="input-field" id="tube-length" placeholder="Введите длину" value="50">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Высота забора (м):</label>
+            <select class="input-field" id="tube-height">
+              <option value="1.5">1.5 м</option>
+              <option value="1.8">1.8 м</option>
+              <option value="2.0" selected>2.0 м</option>
+              <option value="2.2">2.2 м</option>
+              <option value="2.5">2.5 м</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип профильной трубы:</label>
+            <select class="input-field" id="tube-type">
+              <option value="40x20x2">40×20×2 мм</option>
+              <option value="40x40x2">40×40×2 мм</option>
+              <option value="60x40x2">60×40×2 мм</option>
+              <option value="60x60x2">60×60×2 мм</option>
+              <option value="80x80x2">80×80×2 мм</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Шаг столбов (м):</label>
+            <select class="input-field" id="tube-post-step">
+              <option value="2.5">2.5 м</option>
+              <option value="3" selected>3 м</option>
+              <option value="3.5">3.5 м</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Глубина установки столбов (м):</label>
+            <select class="input-field" id="tube-post-depth">
+              <option value="0.8">0.8 м</option>
+              <option value="1.0" selected>1.0 м</option>
+              <option value="1.2">1.2 м</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Тип крепления:</label>
+            <select class="input-field" id="tube-attachment-type">
+              <option value="welding">Сварка</option>
+              <option value="bolts">Болты</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Требуются ворота:</label>
+            <select class="input-field" id="tube-gates">
+              <option value="yes">Да</option>
+              <option value="no" selected>Нет</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Требуется калитка:</label>
+            <select class="input-field" id="tube-gate">
+              <option value="yes">Да</option>
+              <option value="no" selected>Нет</option>
+            </select>
+          </div>
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateFence()">
+          Рассчитать материалы
+        </button>
+        
+        <div class="result-container" id="fence-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="fence-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Создаем мерцающие звезды
+    function createStars() {
+      const starsContainer = document.getElementById('stars');
+      const starCount = 80;
+      
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        
+        // Случайные параметры для звезд
+        const size = Math.random() * 2.5;
+        const posX = Math.random() * 100;
+        const posY = Math.random() * 100;
+        const delay = Math.random() * 4;
+        const duration = 2 + Math.random() * 4;
+        
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${posX}%`;
+        star.style.top = `${posY}%`;
+        star.style.animationDelay = `${delay}s`;
+        star.style.animationDuration = `${duration}s`;
+        
+        starsContainer.appendChild(star);
+      }
+    }
+    
+    // Функция для переключения между разделами
+    function showSection(sectionId) {
+      // Скрыть все разделы
+      document.querySelectorAll('.page').forEach(section => {
+        section.classList.add('hidden');
+      });
+      
+      // Показать нужный раздел
+      document.getElementById(sectionId).classList.remove('hidden');
+      
+      // Прокрутка вверх
+      window.scrollTo(0, 0);
+    }
+    
+    // Показать/скрыть поля в зависимости от типа фундамента
+    function toggleFoundationFields() {
+      const foundationType = document.getElementById('foundation-type').value;
+      
+      // Скрыть все поля
+      document.getElementById('strip-foundation-fields').classList.add('hidden');
+      document.getElementById('pile-foundation-fields').classList.add('hidden');
+      document.getElementById('fb-foundation-fields').classList.add('hidden');
+      
+      // Показать нужные поля
+      if (foundationType === 'strip') {
+        document.getElementById('strip-foundation-fields').classList.remove('hidden');
+      } else if (foundationType === 'pile') {
+        document.getElementById('pile-foundation-fields').classList.remove('hidden');
+      } else if (foundationType === 'fb') {
+        document.getElementById('fb-foundation-fields').classList.remove('hidden');
+      }
+    }
+    
+    // Показать/скрыть поля для многоскатной кровли
+    function toggleRoofFields() {
+      const roofType = document.getElementById('roof-type').value;
+      
+      if (roofType === 'multi') {
+        document.getElementById('multi-roof-fields').classList.remove('hidden');
+      } else {
+        document.getElementById('multi-roof-fields').classList.add('hidden');
+      }
+    }
+    
+    // Обновить толщину стены в зависимости от материала
+    function updateWallThickness() {
+      const material = document.getElementById('wall-material').value;
+      const thicknessSelect = document.getElementById('wall-thickness');
+      
+      // Очистить текущие опции
+      thicknessSelect.innerHTML = '';
+      
+      // Добавить опции в зависимости от материала
+      if (material === 'brick') {
+        thicknessSelect.innerHTML = `
+          <option value="0.25">0.5 кирпича (0.25 м)</option>
+          <option value="0.38">1 кирпич (0.38 м)</option>
+          <option value="0.51">1.5 кирпича (0.51 м)</option>
+          <option value="0.64">2 кирпича (0.64 м)</option>
+        `;
+      } else if (material === 'timber' || material === 'half-timber') {
+        thicknessSelect.innerHTML = `
+          <option value="0.15">0.15 м</option>
+          <option value="0.2">0.2 м</option>
+          <option value="0.25">0.25 м</option>
+          <option value="0.3">0.3 м</option>
+        `;
+      } else if (material === 'concrete-block' || material === 'foam-concrete') {
+        thicknessSelect.innerHTML = `
+          <option value="0.2">0.2 м</option>
+          <option value="0.25">0.25 м</option>
+          <option value="0.3">0.3 м</option>
+          <option value="0.375">0.375 м</option>
+        `;
+      }
+    }
+    
+    // Показать/скрыть поля в зависимости от типа утепления фасада
+    document.getElementById('facade-insulation').addEventListener('change', function() {
+      const insulationGroup = document.getElementById('insulation-thickness-group');
+      insulationGroup.style.display = this.value === 'yes' ? 'block' : 'none';
+    });
+    
+    // Показать/скрыть поля в зависимости от типа отделки
+    function toggleFinishFields() {
+      const finishType = document.getElementById('finish-type').value;
+      
+      // Скрыть все поля
+      document.getElementById('drywall-fields').classList.add('hidden');
+      document.getElementById('plaster-fields').classList.add('hidden');
+      document.getElementById('paint-fields').classList.add('hidden');
+      document.getElementById('wallpaper-fields').classList.add('hidden');
+      document.getElementById('ceiling-fields').classList.add('hidden');
+      document.getElementById('baseboard-fields').classList.add('hidden');
+      document.getElementById('tile-fields').classList.add('hidden');
+      document.getElementById('floor-fields').classList.add('hidden');
+      
+      // Показать нужные поля
+      if (finishType === 'drywall') {
+        document.getElementById('drywall-fields').classList.remove('hidden');
+      } else if (finishType === 'plaster') {
+        document.getElementById('plaster-fields').classList.remove('hidden');
+      } else if (finishType === 'paint') {
+        document.getElementById('paint-fields').classList.remove('hidden');
+      } else if (finishType === 'wallpaper') {
+        document.getElementById('wallpaper-fields').classList.remove('hidden');
+      } else if (finishType === 'ceiling') {
+        document.getElementById('ceiling-fields').classList.remove('hidden');
+      } else if (finishType === 'baseboard') {
+        document.getElementById('baseboard-fields').classList.remove('hidden');
+      } else if (finishType === 'tile') {
+        document.getElementById('tile-fields').classList.remove('hidden');
+      } else if (finishType === 'floor') {
+        document.getElementById('floor-fields').classList.remove('hidden');
+      }
+    }
+    
+    // Показать/скрыть поля в зависимости от типа напольного покрытия
+    function toggleFloorType() {
+      const floorType = document.getElementById('floor-type').value;
+      
+      // Скрыть все поля
+      document.getElementById('laminate-fields').classList.add('hidden');
+      document.getElementById('ceramic-tile-fields').classList.add('hidden');
+      document.getElementById('parquet-fields').classList.add('hidden');
+      document.getElementById('linoleum-fields').classList.add('hidden');
+      
+      // Показать нужные поля
+      if (floorType === 'laminate') {
+        document.getElementById('laminate-fields').classList.remove('hidden');
+      } else if (floorType === 'ceramic-tile') {
+        document.getElementById('ceramic-tile-fields').classList.remove('hidden');
+      } else if (floorType === 'parquet') {
+        document.getElementById('parquet-fields').classList.remove('hidden');
+      } else if (floorType === 'linoleum') {
+        document.getElementById('linoleum-fields').classList.remove('hidden');
+      }
+    }
+    
+    // Показать/скрыть поля в зависимости от типа забора
+    function toggleFenceFields() {
+      const fenceType = document.getElementById('fence-type').value;
+      
+      // Скрыть все поля
+      document.getElementById('profile-sheet-fields').classList.add('hidden');
+      document.getElementById('brick-fields').classList.add('hidden');
+      document.getElementById('tube-fields').classList.add('hidden');
+      
+      // Показать нужные поля
+      if (fenceType === 'profile-sheet') {
+        document.getElementById('profile-sheet-fields').classList.remove('hidden');
+      } else if (fenceType === 'brick') {
+        document.getElementById('brick-fields').classList.remove('hidden');
+      } else if (fenceType === 'tube') {
+        document.getElementById('tube-fields').classList.remove('hidden');
+      }
+    }
+    
+    // Показать/скрыть поля в зависимости от типа фундамента для кирпичного забора
+    document.getElementById('brick-foundation-type').addEventListener('change', function() {
+      const foundationType = this.value;
+      const stripFields = document.getElementById('brick-strip-foundation');
+      
+      if (foundationType === 'strip') {
+        stripFields.style.display = 'block';
+      } else {
+        stripFields.style.display = 'none';
+      }
+    });
+    
+    // Показать/скрыть поля в зависимости от необходимости подложки
+    document.getElementById('floor-underlayment').addEventListener('change', function() {
+      const underlaymentTypeGroup = document.getElementById('underlayment-type-group');
+      const underlaymentThicknessGroup = document.getElementById('underlayment-thickness-group');
+      
+      if (this.value === 'yes') {
+        underlaymentTypeGroup.style.display = 'block';
+        underlaymentThicknessGroup.style.display = 'block';
+      } else {
+        underlaymentTypeGroup.style.display = 'none';
+        underlaymentThicknessGroup.style.display = 'none';
+      }
+    });
+    
+    // Показать/скрыть поля в зависимости от необходимости клея
+    document.getElementById('floor-adhesive').addEventListener('change', function() {
+      const adhesiveTypeGroup = document.getElementById('adhesive-type-group');
+      
+      if (this.value === 'yes') {
+        adhesiveTypeGroup.style.display = 'block';
+      } else {
+        adhesiveTypeGroup.style.display = 'none';
+      }
+    });
+    
+    // Функция расчета фундамента
+    function calculateFoundation() {
+      const foundationType = document.getElementById('foundation-type').value;
+      
+      let resultText = '';
+      
+      // Расчет для ленточного фундамента
+      if (foundationType === 'strip') {
+        const length = parseFloat(document.getElementById('strip-length').value);
+        const width = parseFloat(document.getElementById('strip-width').value);
+        const depth = parseFloat(document.getElementById('strip-depth').value);
+        
+        if (isNaN(length) || isNaN(width) || isNaN(depth)) {
+          alert('Пожалуйста, введите все значения для ленточного фундамента');
+          return;
+        }
+        
+        // Площадь фундамента
+        const area = length * width;
+        
+        // Объем бетона
+        const concreteVolume = area * depth;
+        
+        // Количество арматуры (120 кг/м³)
+        const rebarWeight = concreteVolume * 120;
+        
+        // Количество опалубки
+        const formworkArea = 2 * (length + width) * depth;
+        
+        // Количество хомутов (50 шт/м³)
+        const stirrupCount = Math.ceil(concreteVolume * 50);
+        
+        // Количество гидроизоляции
+        const waterproofingArea = area;
+        
+        // Допустимая нагрузка (250 кПа)
+        const allowableLoad = 250;
+        
+        resultText = `
+          <p><strong>Тип фундамента:</strong> Ленточный</p>
+          <p><strong>Площадь фундамента:</strong> ${area.toFixed(2)} м²</p>
+          <p><strong>Объем бетона:</strong> ${concreteVolume.toFixed(2)} м³</p>
+          <p><strong>Арматура:</strong> ${rebarWeight.toFixed(2)} кг</p>
+          <p><strong>Опалубка:</strong> ${formworkArea.toFixed(2)} м²</p>
+          <p><strong>Хомуты:</strong> ${stirrupCount} шт.</p>
+          <p><strong>Гидроизоляция:</strong> ${waterproofingArea.toFixed(2)} м²</p>
+          <p><strong>Допустимая нагрузка:</strong> ${allowableLoad} кПа</p>
+          <p><strong>Расчет выполнен по СП 22.13330.2016</strong></p>
+        `;
+      }
+      // Расчет для свайного фундамента
+      else if (foundationType === 'pile') {
+        const pileType = document.getElementById('pile-type').value;
+        const pileLength = parseFloat(document.getElementById('pile-length').value);
+        const pileDiameter = parseFloat(document.getElementById('pile-diameter').value);
+        const buildingLength = parseFloat(document.getElementById('pile-building-length').value);
+        const buildingWidth = parseFloat(document.getElementById('pile-building-width').value);
+        
+        if (isNaN(pileLength) || isNaN(pileDiameter) || isNaN(buildingLength) || isNaN(buildingWidth)) {
+          alert('Пожалуйста, введите все значения для свайного фундамента');
+          return;
+        }
+        
+        // Расчет площади здания
+        const buildingArea = buildingLength * buildingWidth;
+        
+        // Расчет количества свай (1 свая на 3 м²)
+        const pileCount = Math.ceil(buildingArea / 3);
+        
+        // Расчет шага свай
+        const pileStep = Math.sqrt(buildingArea / pileCount);
+        
+        // Объем бетона на сваю
+        const radius = pileDiameter / 2000; // в метрах
+        const pileVolume = Math.PI * radius * radius * pileLength * pileCount;
+        
+        // Количество арматуры (150 кг/м³)
+        const rebarWeight = pileVolume * 150;
+        
+        // Допустимая нагрузка (300 кПа)
+        const allowableLoad = 300;
+        
+        resultText = `
+          <p><strong>Тип свай:</strong> ${pileType === 'concrete' ? 'Железобетонные' : 'Винтовые'}</p>
+          <p><strong>Количество свай:</strong> ${pileCount} шт.</p>
+          <p><strong>Длина свай:</strong> ${pileLength} м</p>
+          <p><strong>Диаметр свай:</strong> ${pileDiameter} мм</p>
+          <p><strong>Шаг свай:</strong> ${pileStep.toFixed(2)} м</p>
+          <p><strong>Объем бетона:</strong> ${pileVolume.toFixed(2)} м³</p>
+          <p><strong>Арматура:</strong> ${rebarWeight.toFixed(2)} кг</p>
+          <p><strong>Допустимая нагрузка:</strong> ${allowableLoad} кПа</p>
+          <p><strong>Расчет выполнен по СП 22.13330.2016</strong></p>
+        `;
+      }
+      // Расчет для блоков ФБС
+      else if (foundationType === 'fb') {
+        const fbType = document.getElementById('fb-type').value;
+        const fbCount = parseInt(document.getElementById('fb-count').value);
+        const fbSize = document.getElementById('fb-size').value;
+        
+        if (isNaN(fbCount) || !fbSize) {
+          alert('Пожалуйста, введите все значения для блоков ФБС');
+          return;
+        }
+        
+        // Размеры блоков
+        const dimensions = fbSize.split('x').map(d => parseFloat(d));
+        const blockLength = dimensions[0]; // м
+        const blockWidth = dimensions[1]; // м
+        const blockHeight = dimensions[2]; // м
+        
+        // Объем блоков
+        const fbVolume = fbCount * blockLength * blockWidth * blockHeight;
+        
+        // Вес блоков
+        let fbWeight = 0;
+        if (fbType === 'standard') {
+          fbWeight = fbVolume * 1800; // 1800 кг/м³ для стандартных блоков
+        } else if (fbType === 'heavy') {
+          fbWeight = fbVolume * 2200; // 2200 кг/м³ для тяжелых блоков
+        } else {
+          fbWeight = fbVolume * 1500; // 1500 кг/м³ для легких блоков
+        }
+        
+        // Количество арматуры для блоков
+        const fbRebarWeight = fbVolume * 50; // 50 кг/м³ арматуры
+        
+        // Допустимая нагрузка
+        const allowableLoad = 200; // кПа
+        
+        resultText = `
+          <p><strong>Тип блоков ФБС:</strong> ${fbType === 'standard' ? 'Стандартные' : fbType === 'heavy' ? 'Тяжелые' : 'Легкие'}</p>
+          <p><strong>Количество блоков:</strong> ${fbCount} шт.</p>
+          <p><strong>Размер блоков:</strong> ${blockLength}×${blockWidth}×${blockHeight} м</p>
+          <p><strong>Объем блоков:</strong> ${fbVolume.toFixed(2)} м³</p>
+          <p><strong>Вес блоков:</strong> ${fbWeight.toFixed(2)} кг</p>
+          <p><strong>Арматура:</strong> ${fbRebarWeight.toFixed(2)} кг</p>
+          <p><strong>Допустимая нагрузка:</strong> ${allowableLoad} кПа</p>
+          <p><strong>Расчет выполнен по СП 22.13330.2016</strong></p>
+        `;
+      }
+      
+      // Показываем результаты
+      document.getElementById('foundation-result-text').innerHTML = resultText;
+      document.getElementById('foundation-result').style.display = 'block';
+    }
+    
+    // Функция расчета стен
+    function calculateWalls() {
+      const material = document.getElementById('wall-material').value;
+      const floors = parseInt(document.getElementById('wall-floors').value);
+      const length = parseFloat(document.getElementById('wall-length').value);
+      const width = parseFloat(document.getElementById('wall-width').value);
+      const floorHeight = parseFloat(document.getElementById('wall-floor-height').value);
+      const thickness = parseFloat(document.getElementById('wall-thickness').value);
+      const windows = parseInt(document.getElementById('wall-windows').value);
+      const windowSize = document.getElementById('wall-window-size').value;
+      const doors = parseInt(document.getElementById('wall-doors').value);
+      const doorSize = document.getElementById('wall-door-size').value;
+      const armorBelt = document.getElementById('wall-armor-belt').value;
+      const soilType = document.getElementById('wall-soil-type').value;
+      const houseArea = parseFloat(document.getElementById('wall-house-area').value);
+      
+      if (isNaN(floors) || isNaN(length) || isNaN(width) || isNaN(floorHeight) || 
+          isNaN(thickness) || isNaN(windows) || isNaN(doors) || isNaN(houseArea)) {
+        alert('Пожалуйста, введите все значения для расчета стен');
+        return;
+      }
+      
+      // Размеры окон
+      const windowSizeParts = windowSize.split('x').map(d => parseFloat(d));
+      const windowWidth = windowSizeParts[0];
+      const windowHeight = windowSizeParts[1];
+      
+      // Размеры дверей
+      const doorSizeParts = doorSize.split('x').map(d => parseFloat(d));
+      const doorWidth = doorSizeParts[0];
+      const doorHeight = doorSizeParts[1];
+      
+      // Общая площадь стен
+      const perimeter = 2 * (length + width);
+      const totalHeight = floors * floorHeight;
+      const wallArea = perimeter * totalHeight;
+      
+      // Площадь проемов
+      const windowArea = windows * windowWidth * windowHeight;
+      const doorArea = doors * doorWidth * doorHeight;
+      const openingsArea = windowArea + doorArea;
+      
+      // Полезная площадь стен
+      const usefulWallArea = wallArea - openingsArea;
+      
+      // Объем кладки
+      const wallVolume = usefulWallArea * thickness;
+      
+      // Расчет материала
+      let materialCount = 0;
+      let materialName = '';
+      let mortarVolume = 0;
+      let insulationVolume = 0;
+      
+      if (material === 'brick') {
+        // Кирпич (250х120х65 мм)
+        materialName = 'кирпичей';
+        materialCount = Math.ceil(wallVolume * 400); // 400 кирпичей на м³
+        mortarVolume = wallVolume * 0.25; // 0.25 м³ раствора на м³ кладки
+      } else if (material === 'timber' || material === 'half-timber') {
+        // Брус или полубрус
+        materialName = 'м³ бруса';
+        materialCount = wallVolume;
+        mortarVolume = 0; // Для бруса раствора нет
+      } else {
+        // Шлакоблок или пенобетон
+        materialName = 'блоков';
+        materialCount = Math.ceil(wallVolume * 8.3); // 8.3 блока на м³
+        mortarVolume = wallVolume * 0.03; // 0.03 м³ раствора на м³ кладки
+      }
+      
+      // Расчет утеплителя
+      if (thickness < 0.5) {
+        insulationVolume = usefulWallArea * 0.1; // 100 мм утеплителя
+      }
+      
+      // Расчет армопояса
+      let armorBeltInfo = '';
+      if (armorBelt === 'yes') {
+        const armorBeltVolume = perimeter * 0.25 * 0.2; // 25 см ширина, 20 см высота
+        const armorBeltRebar = armorBeltVolume * 120; // 120 кг/м³ арматуры
+        armorBeltInfo = `
+          <p><strong>Армопояс:</strong> ${armorBeltVolume.toFixed(2)} м³</p>
+          <p><strong>Арматура армопояса:</strong> ${armorBeltRebar.toFixed(2)} кг</p>
+        `;
+      }
+      
+      // Расчет нагрузки на фундамент
+      let loadPerArea = 0;
+      let totalLoad = 0;
+      
+      // Удельная нагрузка в зависимости от материала (кН/м²)
+      const loadFactors = {
+        'brick': 15.0,    // Кирпичная кладка
+        'timber': 4.0,    // Брус
+        'half-timber': 5.0, // Полубрус
+        'concrete-block': 8.0, // Шлакоблок
+        'foam-concrete': 6.0   // Пенобетон
+      };
+      
+      loadPerArea = loadFactors[material];
+      
+      // Добавляем нагрузку от перекрытий и кровли (примерно 5 кН/м²)
+      loadPerArea += 5.0;
+      
+      // Общая нагрузка
+      totalLoad = houseArea * loadPerArea;
+      
+      // Допустимая нагрузка для грунта (кН/м²)
+      const soilLoadFactors = {
+        'clay': 100,      // Глина
+        'silt': 200,      // Суглинок
+        'sand': 300,      // Песок
+        'rock': 500       // Скальный грунт
+      };
+      
+      const maxLoad = soilLoadFactors[soilType];
+      
+      // Проверка на соответствие
+      const isLoadAcceptable = totalLoad <= (houseArea * maxLoad);
+      
+      resultText = `
+        <p><strong>Материал стен:</strong> ${material === 'brick' ? 'Кирпич рядовой' : 
+          material === 'timber' ? 'Брус' : 
+          material === 'half-timber' ? 'Полубрус' : 
+          material === 'concrete-block' ? 'Шлакоблок' : 'Пенобетон'}</p>
+        <p><strong>Этажность:</strong> ${floors}</p>
+        <p><strong>Общая площадь стен:</strong> ${wallArea.toFixed(2)} м²</p>
+        <p><strong>Площадь проемов:</strong> ${openingsArea.toFixed(2)} м²</p>
+        <p><strong>Полезная площадь стен:</strong> ${usefulWallArea.toFixed(2)} м²</p>
+        <p><strong>Объем кладки:</strong> ${wallVolume.toFixed(2)} м³</p>
+        <p><strong>${materialName}:</strong> ${materialCount}</p>
+        <p><strong>Раствор:</strong> ${mortarVolume.toFixed(2)} м³</p>
+        <p><strong>Цемент:</strong> ${(mortarVolume * 400).toFixed(2)} кг</p>
+        ${armorBeltInfo}
+        <p><strong>Утеплитель:</strong> ${insulationVolume.toFixed(2)} м³</p>
+        <p><strong>Монтажная пена:</strong> ${Math.ceil(usefulWallArea * 0.5)} баллонов</p>
+        <p><strong>Проволока для арматуры:</strong> ${Math.ceil(perimeter * floors * 0.5)} м</p>
+        
+        <p><strong>Нагрузка на фундамент:</strong></p>
+        <p><strong>Тип грунта:</strong> ${soilType === 'clay' ? 'Глина' : 
+          soilType === 'silt' ? 'Суглинок' : 
+          soilType === 'sand' ? 'Песок' : 'Скальный грунт'}</p>
+        <p><strong>Удельная нагрузка:</strong> ${loadPerArea.toFixed(1)} кН/м²</p>
+        <p><strong>Общая нагрузка:</strong> ${totalLoad.toFixed(2)} кН</p>
+        <p><strong>Допустимая нагрузка для грунта:</strong> ${maxLoad} кН/м²</p>
+        <p><strong>Максимально допустимая нагрузка:</strong> ${(houseArea * maxLoad).toFixed(2)} кН</p>
+        <p><strong>Соответствует требованиям:</strong> ${isLoadAcceptable ? 'Да' : 'Нет'}</p>
+        
+        <p><strong>Расчет выполнен по СП 2.13330.2016</strong></p>
+      `;
+      
+      // Показываем результаты
+      document.getElementById('walls-result-text').innerHTML = resultText;
+      document.getElementById('walls-result').style.display = 'block';
+    }
+    
+    // Функция расчета кровли
+    function calculateRoof() {
+      const roofType = document.getElementById('roof-type').value;
+      const length = parseFloat(document.getElementById('roof-length').value);
+      const width = parseFloat(document.getElementById('roof-width').value);
+      const angle = parseFloat(document.getElementById('roof-angle').value);
+      const additionalSlopes = parseInt(document.getElementById('roof-additional-slopes').value) || 0;
+      const windows = parseInt(document.getElementById('roof-windows').value) || 0;
+      const chimneys = parseInt(document.getElementById('roof-chimneys').value) || 0;
+      const material = document.getElementById('roof-material').value;
+      const snowRegion = document.getElementById('roof-snow-region').value;
+      const windRegion = document.getElementById('roof-wind-region').value;
+      
+      if (isNaN(length) || isNaN(width) || isNaN(angle)) {
+        alert('Пожалуйста, введите все значения для расчета кровли');
+        return;
+      }
+      
+      // Перевод угла в радианы
+      const angleRad = angle * Math.PI / 180;
+      
+      // Расчет длины стропил
+      const rafterLength = width / (2 * Math.cos(angleRad));
+      
+      // Расчет площади кровли
+      let roofArea = 0;
+      if (roofType === 'single') {
+        roofArea = length * rafterLength;
+      } else if (roofType === 'double') {
+        roofArea = 2 * length * rafterLength;
+      } else if (roofType === 'multi') {
+        roofArea = (2 + additionalSlopes) * length * rafterLength;
+      }
+      
+      // Расчет стропильной системы
+      const rafterCount = Math.ceil(length / 0.6) + 1; // шаг 60 см
+      const rafterVolume = rafterCount * rafterLength * 0.05 * 0.15; // 5x15 см
+      
+      // Расчет обрешетки
+      const latticeArea = roofArea;
+      const latticeCount = Math.ceil(roofArea / 0.3); // 0.3 м² на доску
+      const latticeVolume = latticeArea * 0.025 * 0.1; // 2.5x10 см
+      
+      // Расчет кровельного материала
+      let materialName = '';
+      let materialCount = 0;
+      let underlaymentCount = 0;
+      let fastenersCount = 0;
+      
+      switch (material) {
+        case 'ondulin':
+          materialName = 'Ондулин';
+          materialCount = Math.ceil(roofArea * 1.1); // 10% запас
+          underlaymentCount = Math.ceil(roofArea * 1.1);
+          fastenersCount = Math.ceil(roofArea * 20); // 20 гвоздей на м²
+          break;
+        case 'metal-tile':
+          materialName = 'Металлочерепица';
+          materialCount = Math.ceil(roofArea * 1.15); // 15% запас
+          underlaymentCount = Math.ceil(roofArea * 1.15);
+          fastenersCount = Math.ceil(roofArea * 7); // 7 саморезов на м²
+          break;
+        case 'soft-tile':
+          materialName = 'Гибкая черепица';
+          materialCount = Math.ceil(roofArea * 1.15); // 15% запас
+          underlaymentCount = Math.ceil(roofArea * 1.15);
+          fastenersCount = Math.ceil(roofArea * 30); // 30 гвоздей на м²
+          break;
+        case 'profile-sheet':
+          materialName = 'Профнастил';
+          materialCount = Math.ceil(roofArea * 1.1); // 10% запас
+          underlaymentCount = Math.ceil(roofArea * 1.1);
+          fastenersCount = Math.ceil(roofArea * 7); // 7 саморезов на м²
+          break;
+        case 'ceramic-tile':
+          materialName = 'Керамическая черепица';
+          materialCount = Math.ceil(roofArea * 1.15); // 15% запас
+          underlaymentCount = Math.ceil(roofArea * 1.15);
+          fastenersCount = Math.ceil(roofArea * 10); // 10 гвоздей на м²
+          break;
+      }
+      
+      // Расчет дополнительных элементов
+      const ridgeLength = roofType === 'single' ? length : length * 2;
+      const eavesLength = roofType === 'single' ? 2 * length : 2 * (length + width);
+      const valleysLength = additionalSlopes * length;
+      const windowsArea = windows * 1.2;
+      const chimneysArea = chimneys * 0.5;
+      
+      // Расчет снеговой нагрузки
+      const snowLoadFactors = {
+        '1': 0.8,   // I снеговой район
+        '2': 1.2,   // II снеговой район
+        '3': 1.8,   // III снеговой район
+        '4': 2.4,   // IV снеговой район
+        '5': 3.2,   // V снеговой район
+        '6': 4.0,   // VI снеговой район
+        '7': 4.8    // VII снеговой район
+      };
+      
+      const snowLoad = snowLoadFactors[snowRegion];
+      const totalSnowLoad = roofArea * snowLoad;
+      
+      // Расчет дождевой нагрузки (водосточной системы)
+      const rainfallFactors = {
+        '1': 50,    // I ветровой район
+        '2': 70,    // II ветровой район
+        '3': 100,   // III ветровой район
+        '4': 140,   // IV ветровой район
+        '5': 180,   // V ветровой район
+        '6': 230    // VI ветровой район
+      };
+      
+      const rainfallLoad = rainfallFactors[windRegion];
+      const totalRainfallLoad = roofArea * rainfallLoad / 1000; // в литрах
+      
+      // Расчет водосточной системы
+      const gutterLength = eavesLength;
+      const downspoutsCount = Math.ceil(gutterLength / 10); // 1 воронка на 10 м
+      
+      resultText = `
+        <p><strong>Тип кровли:</strong> ${roofType === 'single' ? 'Односкатная' : 
+          roofType === 'double' ? 'Двухскатная' : 'Многоскатная'}</p>
+        <p><strong>Площадь кровли:</strong> ${roofArea.toFixed(2)} м²</p>
+        <p><strong>Длина стропил:</strong> ${rafterLength.toFixed(2)} м</p>
+        <p><strong>Количество стропил:</strong> ${rafterCount} шт.</p>
+        <p><strong>Объем стропил:</strong> ${rafterVolume.toFixed(2)} м³</p>
+        <p><strong>Обрешетка:</strong> ${latticeVolume.toFixed(2)} м³</p>
+        <p><strong>${materialName}:</strong> ${materialCount.toFixed(2)} м²</p>
+        <p><strong>Подкладочный ковер:</strong> ${underlaymentCount.toFixed(2)} м²</p>
+        <p><strong>Крепежи:</strong> ${fastenersCount} шт.</p>
+        <p><strong>Конек:</strong> ${ridgeLength.toFixed(2)} м</p>
+        <p><strong>Водосточные желобы:</strong> ${eavesLength.toFixed(2)} м</p>
+        ${valleysLength > 0 ? `<p><strong>Ендовы:</strong> ${valleysLength.toFixed(2)} м</p>` : ''}
+        ${windows > 0 ? `<p><strong>Мансардные окна:</strong> ${windows} шт.</p>` : ''}
+        ${chimneys > 0 ? `<p><strong>Дымоходы:</strong> ${chimneys} шт.</p>` : ''}
+        
+        <p><strong>Снеговая нагрузка:</strong></p>
+        <p><strong>Снеговой район:</strong> ${snowRegion}</p>
+        <p><strong>Снеговая нагрузка:</strong> ${snowLoad} кН/м²</p>
+        <p><strong>Общая снеговая нагрузка:</strong> ${totalSnowLoad.toFixed(2)} кН</p>
+        
+        <p><strong>Дождевая нагрузка:</strong></p>
+        <p><strong>Ветровой район:</strong> ${windRegion}</p>
+        <p><strong>Дождевая нагрузка:</strong> ${rainfallLoad} л/с·м²</p>
+        <p><strong>Общий объем дождевых вод:</strong> ${totalRainfallLoad.toFixed(2)} л</p>
+        <p><strong>Длина водосточной системы:</strong> ${gutterLength.toFixed(2)} м</p>
+        <p><strong>Количество воронок:</strong> ${downspoutsCount} шт.</p>
+        
+        <p><strong>Расчет выполнен по СП 20.13330.2016</strong></p>
+      `;
+      
+      // Показываем результаты
+      document.getElementById('roof-result-text').innerHTML = resultText;
+      document.getElementById('roof-result').style.display = 'block';
+    }
+    
+    // Функция расчета фасада
+    function calculateFacade() {
+      const facadeType = document.getElementById('facade-type').value;
+      const length = parseFloat(document.getElementById('facade-length').value);
+      const width = parseFloat(document.getElementById('facade-width').value);
+      const height = parseFloat(document.getElementById('facade-height').value);
+      const latticeType = document.getElementById('facade-lattice').value;
+      const latticeStep = parseFloat(document.getElementById('facade-lattice-step').value) / 1000; // в метрах
+      const insulation = document.getElementById('facade-insulation').value;
+      const insulationThickness = document.getElementById('facade-insulation-thickness').value;
+      
+      if (isNaN(length) || isNaN(width) || isNaN(height) || isNaN(latticeStep)) {
+        alert('Пожалуйста, введите все значения для расчета фасада');
+        return;
+      }
+      
+      // Периметр здания
+      const perimeter = 2 * (length + width);
+      
+      // Площадь фасада
+      const facadeArea = perimeter * height;
+      
+      // Расчет обрешетки
+      const latticeCount = Math.ceil(facadeArea / latticeStep);
+      const latticeLength = latticeCount * perimeter;
+      
+      // Расчет материала фасада
+      let materialName = '';
+      let materialCount = 0;
+      let fastenersCount = 0;
+      
+      switch (facadeType) {
+        case 'siding':
+          materialName = 'Металлосайдинг';
+          materialCount = facadeArea * 1.05; // 5% запас
+          fastenersCount = Math.ceil(facadeArea * 10); // 10 шт. на м²
+          break;
+        case 'brick':
+          materialName = 'Облицовочный кирпич';
+          materialCount = facadeArea * 50; // 50 кирпичей на м²
+          fastenersCount = 0; // Для кирпича крепежи не нужны
+          break;
+        case 'alucobond':
+          materialName = 'Алюкобонд';
+          materialCount = facadeArea * 1.03; // 3% запас
+          fastenersCount = Math.ceil(facadeArea * 8); // 8 крепежей на м²
+          break;
+        case 'plaster':
+          materialName = 'Штукатурка';
+          materialCount = facadeArea * 1.1; // 10% запас
+          fastenersCount = 0; // Для штукатурки крепежи не нужны
+          break;
+      }
+      
+      // Расчет утеплителя
+      let insulationInfo = '';
+      if (insulation === 'yes') {
+        const insulationVolume = facadeArea * (insulationThickness / 1000);
+        insulationInfo = `
+          <p><strong>Утеплитель:</strong> ${facadeArea.toFixed(2)} м²</p>
+          <p><strong>Толщина утеплителя:</strong> ${insulationThickness} мм</p>
+          <p><strong>Объем утеплителя:</strong> ${insulationVolume.toFixed(2)} м³</p>
+          <p><strong>Дюбели для утеплителя:</strong> ${Math.ceil(facadeArea * 6)} шт.</p>
+        `;
+      }
+      
+      resultText = `
+        <p><strong>Тип фасада:</strong> ${facadeType === 'siding' ? 'Металлосайдинг' : 
+          facadeType === 'brick' ? 'Облицовочный кирпич' : 
+          facadeType === 'alucobond' ? 'Алюкобонд' : 'Штукатурка'}</p>
+        <p><strong>Площадь фасада:</strong> ${facadeArea.toFixed(2)} м²</p>
+        <p><strong>Обрешетка:</strong> ${latticeLength.toFixed(2)} м</p>
+        <p><strong>${materialName}:</strong> ${materialCount.toFixed(2)} ${facadeType === 'brick' ? 'шт.' : 'м²'}</p>
+        <p><strong>Крепежи:</strong> ${fastenersCount} шт.</p>
+        ${insulationInfo}
+        <p><strong>Расчет выполнен по СП 2.13330.2016</strong></p>
+      `;
+      
+      // Показываем результаты
+      document.getElementById('facade-result-text').innerHTML = resultText;
+      document.getElementById('facade-result').style.display = 'block';
+    }
+    
+    // Функция расчета отделочных работ
+    function calculateFinish() {
+      const finishType = document.getElementById('finish-type').value;
+      
+      let resultText = '';
+      
+      // Расчет гипсокартона
+      if (finishType === 'drywall') {
+        const wallArea = parseFloat(document.getElementById('drywall-wall-area').value);
+        const ceilingArea = parseFloat(document.getElementById('drywall-ceiling-area').value);
+        const thickness = document.getElementById('drywall-thickness').value;
+        const type = document.getElementById('drywall-type').value;
+        const profileType = document.getElementById('drywall-profile-type').value;
+        
+        if (isNaN(wallArea) || isNaN(ceilingArea)) {
+          alert('Пожалуйста, введите площадь стен и потолка для расчета гипсокартона');
+          return;
+        }
+        
+        // Расчет количества листов гипсокартона (лист 1.2×2.5 м = 3 м²)
+        const drywallSheetArea = 3.0; // м²
+        const drywallSheetsWall = Math.ceil(wallArea / drywallSheetArea);
+        const drywallSheetsCeiling = Math.ceil(ceilingArea / drywallSheetArea);
+        const totalDrywallSheets = drywallSheetsWall + drywallSheetsCeiling;
+        
+        // Расчет профиля
+        let profileLength = 0;
+        if (profileType === 'stoyka') {
+          // CD профиль (стоечный)
+          profileLength = (wallArea / 0.6) * 3; // шаг 60 см
+        } else {
+          // UD профиль (направляющий)
+          profileLength = (wallArea / 0.6) * 3 + (ceilingArea / 0.6) * 3;
+        }
+        
+        // Расчет метизов
+        const screwsCount = Math.ceil((wallArea + ceilingArea) * 25); // 25 саморезов на м²
+        const connectorsCount = Math.ceil(profileLength / 3); // соединители каждые 3 м
+        
+        resultText = `
+          <p><strong>Тип отделки:</strong> Гипсокартон</p>
+          <p><strong>Площадь стен:</strong> ${wallArea} м²</p>
+          <p><strong>Площадь потолка:</strong> ${ceilingArea} м²</p>
+          <p><strong>Толщина гипсокартона:</strong> ${thickness} мм</p>
+          <p><strong>Тип гипсокартона:</strong> ${type === 'standard' ? 'Стандартный' : 
+            type === 'moisture' ? 'Влагостойкий' : 'Огнестойкий'}</p>
+          <p><strong>Тип профиля:</strong> ${profileType === 'stoyka' ? 'ПН-стоечный (CD)' : 'ПН-направляющий (UD)'}</p>
+          <p><strong>Листы гипсокартона:</strong> ${totalDrywallSheets} шт.</p>
+          <p><strong>Профиль:</strong> ${profileLength.toFixed(2)} м</p>
+          <p><strong>Саморезы:</strong> ${screwsCount} шт.</p>
+          <p><strong>Соединители профиля:</strong> ${connectorsCount} шт.</p>
+          <p><strong>Шпаклевка:</strong> ${((wallArea + ceilingArea) * 1.5).toFixed(2)} кг</p>
+          <p><strong>Серпянка:</strong> ${Math.ceil((wallArea + ceilingArea) * 0.5)} м</p>
+          <p><strong>Грунтовка:</strong> ${(wallArea + ceilingArea).toFixed(2)} л</p>
+          <p><strong>Расчет выполнен по СП 2.13330.2016</strong></p>
+        `;
+      }
+      // Расчет штукатурки
+      else if (finishType === 'plaster') {
+        const wallArea = parseFloat(document.getElementById('plaster-wall-area').value);
+        const ceilingArea = parseFloat(document.getElementById('plaster-ceiling-area').value);
+        const thickness = document.getElementById('plaster-thickness').value;
+        const type = document.getElementById('plaster-type').value;
+        const reinforcement = document.getElementById('plaster-reinforcement').value;
+        
+        if (isNaN(wallArea) || isNaN(ceilingArea)) {
+          alert('Пожалуйста, введите площадь стен и потолка для расчета штукатурки');
+          return;
+        }
+        
+        // Расход штукатурки в кг/м² (зависит от толщины)
+        const consumptionFactors = {
+          '10': 9,
+          '15': 13.5,
+          '20': 18,
+          '25': 22.5,
+          '30': 27
+        };
+        
+        const consumption = consumptionFactors[thickness];
+        const totalPlaster = (wallArea + ceilingArea) * consumption / 1000; // в мешках (25 кг)
+        
+        // Расчет армирования
+        let reinforcementInfo = '';
+        if (reinforcement === 'yes') {
+          const meshArea = wallArea + ceilingArea;
+          const meshRolls = Math.ceil(meshArea / 50); // рулон 50 м²
+          const meshTape = Math.ceil((wallArea + ceilingArea) * 0.5); // лента на стыки
+          
+          reinforcementInfo = `
+            <p><strong>Сетка:</strong> ${meshRolls} рул.</p>
+            <p><strong>Лента для стыков:</strong> ${meshTape} м</p>
+          `;
+        }
+        
+        resultText = `
+          <p><strong>Тип отделки:</strong> Штукатурка</p>
+          <p><strong>Площадь стен:</strong> ${wallArea} м²</p>
+          <p><strong>Площадь потолка:</strong> ${ceilingArea} м²</p>
+          <p><strong>Толщина штукатурки:</strong> ${thickness} мм</p>
+          <p><strong>Тип штукатурки:</strong> ${type === 'cement' ? 'Цементно-песчаная' : 
+            type === 'gypsum' ? 'Гипсовая' : 
+            type === 'lime' ? 'Известковая' : 'Глиняная'}</p>
+          <p><strong>Штукатурная смесь:</strong> ${totalPlaster.toFixed(2)} мешков (25 кг)</p>
+          <p><strong>Грунтовка:</strong> ${((wallArea + ceilingArea) * 0.2).toFixed(2)} л</p>
+          ${reinforcementInfo}
+          <p><strong>Расчет выполнен по СП 2.13330.2016</strong></p>
+        `;
+      }
+      // Расчет покраски
+      else if (finishType === 'paint') {
+        const wallArea = parseFloat(document.getElementById('paint-wall-area').value);
+        const ceilingArea = parseFloat(document.getElementById('paint-ceiling-area').value);
+        const layers = document.getElementById('paint-layers').value;
+        const type = document.getElementById('paint-type').value;
+        const consumption = parseFloat(document.getElementById('paint-consumption').value);
+        
+        if (isNaN(wallArea) || isNaN(ceilingArea) || isNaN(consumption)) {
+          alert('Пожалуйста, введите все значения для расчета покраски');
+          return;
+        }
+        
+        // Общая площадь для покраски
+        const totalArea = wallArea + ceilingArea;
+        
+        // Общий расход краски в литрах
+        const totalPaint = totalArea * consumption * layers / 1000;
+        
+        // Расчет грунтовки
+        const primer = totalArea * 0.2; // 200 мл/м²
+        
+        resultText = `
+          <p><strong>Тип отделки:</strong> Покраска</p>
+          <p><strong>Площадь стен:</strong> ${wallArea} м²</p>
+          <p><strong>Площадь потолка:</strong> ${ceilingArea} м²</p>
+          <p><strong>Количество слоев:</strong> ${layers}</p>
+          <p><strong>Тип краски:</strong> ${type === 'water' ? 'Водоэмульсионная' : 
+            type === 'acrylic' ? 'Акриловая' : 
+            type === 'latex' ? 'Латексная' : 
+            type === 'silicone' ? 'Силиконовая' : 'Силикатная'}</p>
+          <p><strong>Расход краски:</strong> ${consumption} мл/м²</p>
+          <p><strong>Краска:</strong> ${totalPaint.toFixed(2)} л</p>
+          <p><strong>Грунтовка:</strong> ${primer.toFixed(2)} л</p>
+          <p><strong>Кисти/вальцы:</strong> ${Math.ceil(totalArea / 50)} комплектов</p>
+          <p><strong>Расчет выполнен по СП 2.13330.2016</strong></p>
+        `;
+      }
+      // Расчет обоев
+      else if (finishType === 'wallpaper') {
+        const area = parseFloat(document.getElementById('wallpaper-area').value);
+        const width = document.getElementById('wallpaper-width').value;
+        const length = document.getElementById('wallpaper-length').value;
+        const density = document.getElementById('wallpaper-density').value;
+        const type = document.getElementById('wallpaper-type').value;
+        const pattern = document.getElementById('wallpaper-pattern').value;
+        
+        if (isNaN(area)) {
+          alert('Пожалуйста, введите площадь стен для расчета обоев');
+          return;
+        }
+        
+        // Площадь одного рулона
+        const rollArea = width * length;
+        
+        // Коэффициент запаса (зависит от наличия рисунка)
+        const reserveFactor = pattern === 'yes' ? 1.2 : 1.1;
+        
+        // Количество рулонов
+        const rollsCount = Math.ceil((area * reserveFactor) / rollArea);
+        
+        // Расчет клея
+        const glue = Math.ceil(rollsCount / 5); // 1 пачка на 5 рулонов
+        
+        resultText = `
+          <p><strong>Тип отделки:</strong> Обои</p>
+          <p><strong>Площадь стен:</strong> ${area} м²</p>
+          <p><strong>Ширина обоев:</strong> ${width} м</p>
+          <p><strong>Длина рулона:</strong> ${length} м</p>
+          <p><strong>Плотность обоев:</strong> ${density} г/м²</p>
+          <p><strong>Тип обоев:</strong> ${type === 'paper' ? 'Бумажные' : 
+            type === 'vinyl' ? 'Виниловые' : 
+            type === 'non-woven' ? 'Флизелиновые' : 
+            type === 'textile' ? 'Текстильные' : 'Жидкие'}</p>
+          <p><strong>Подгоночный рисунок:</strong> ${pattern === 'yes' ? 'Да' : 'Нет'}</p>
+          <p><strong>Рулоны обоев:</strong> ${rollsCount} шт.</p>
+          <p><strong>Клей для обоев:</strong> ${glue} пачек</p>
+          <p><strong>Плинтус потолочный:</strong> ${Math.ceil(area / 3)} м</p>
+          <p><strong>Расчет выполнен по СП 2.13330.2016</strong></p>
+        `;
+      }
+      // Расчет натяжного потолка
+      else if (finishType === 'ceiling') {
+        const area = parseFloat(document.getElementById('ceiling-area').value);
+        const type = document.getElementById('ceiling-type').value;
+        const color = document.getElementById('ceiling-color').value;
+        const levels = document.getElementById('ceiling-levels').value;
+        const shape = document.getElementById('ceiling-shape').value;
+        
+        if (isNaN(area)) {
+          alert('Пожалуйста, введите площадь потолка для расчета натяжного потолка');
+          return;
+        }
+        
+        // Цена за м² (условная)
+        const priceFactors = {
+          'matte': 500,
+          'satin': 600,
+          'glossy': 700
+        };
+        
+        const pricePerArea = priceFactors[type];
+        const totalPrice = area * pricePerArea * levels;
+        
+        // Расчет профиля
+        const perimeter = Math.sqrt(area) * 4; // упрощенный расчет периметра
+        const profileLength = perimeter * levels;
+        
+        // Расчет гарпунов
+        const harpoonLength = profileLength;
+        
+        // Расчет ламп
+        const lampsCount = Math.ceil(area / 4); // 1 лампа на 4 м²
+        
+        resultText = `
+          <p><strong>Тип отделки:</strong> Натяжной потолок</p>
+          <p><strong>Площадь потолка:</strong> ${area} м²</p>
+          <p><strong>Тип потолка:</strong> ${type === 'matte' ? 'Матовый' : 
+            type === 'satin' ? 'Сатиновый' : 'Глянцевый'}</p>
+          <p><strong>Цвет потолка:</strong> ${color === 'white' ? 'Белый' : 
+            color === 'beige' ? 'Бежевый' : 
+            color === 'gray' ? 'Серый' : 'Черный'}</p>
+          <p><strong>Количество уровней:</strong> ${levels}</p>
+          <p><strong>Форма потолка:</strong> ${shape === 'square' ? 'Прямоугольная' : 
+            shape === 'round' ? 'Круглая' : 'Сложная'}</p>
+          <p><strong>Площадь полотна:</strong> ${area.toFixed(2)} м²</p>
+          <p><strong>Профиль ПВХ:</strong> ${profileLength.toFixed(2)} м</p>
+          <p><strong>Гарпуны:</strong> ${harpoonLength.toFixed(2)} м</p>
+          <p><strong>Светильники:</strong> ${lampsCount} шт.</p>
+          <p><strong>Стоимость работ:</strong> ${totalPrice.toFixed(2)} руб.</p>
+          <p><strong>Расчет выполнен по СП 2.13330.2016</strong></p>
+        `;
+      }
+      // Расчет плинтусов
+      else if (finishType === 'baseboard') {
+        const length = parseFloat(document.getElementById('baseboard-length').value);
+        const type = document.getElementById('baseboard-type').value;
+        const material = document.getElementById('baseboard-material').value;
+        const stripLength = document.getElementById('baseboard-strip-length').value;
+        const corners = document.getElementById('baseboard-corners').value;
+        
+        if (isNaN(length)) {
+          alert('Пожалуйста, введите длину стен для расчета плинтусов');
+          return;
+        }
+        
+        // Количество планок
+        const stripsCount = Math.ceil(length / stripLength);
+        
+        // Расчет уголков
+        let cornersInfo = '';
+        if (corners === 'yes') {
+          const cornersCount = Math.ceil(length / 5); // примерно 1 уголок на 5 м
+          cornersInfo = `<p><strong>Уголки:</strong> ${cornersCount} шт.</p>`;
+        }
+        
+        // Расчет крепежей
+        const fasteners = Math.ceil(length * 2); // 2 крепежа на метр
+        
+        resultText = `
+          <p><strong>Тип отделки:</strong> Плинтуса</p>
+          <p><strong>Длина стен:</strong> ${length} м</p>
+          <p><strong>Тип плинтуса:</strong> ${type === 'floor' ? 'Напольный' : 'Потолочный'}</p>
+          <p><strong>Материал плинтуса:</strong> ${material === 'wood' ? 'Деревянный' : 
+            material === 'mdf' ? 'МДФ' : 
+            material === 'plastic' ? 'Пластиковый' : 'Полиуретановый'}</p>
+          <p><strong>Длина планки:</strong> ${stripLength} м</p>
+          <p><strong>Плинтус:</strong> ${stripsCount} планок</p>
+          ${cornersInfo}
+          <p><strong>Крепежи:</strong> ${fasteners} шт.</p>
+          <p><strong>Клей для плинтуса:</strong> ${Math.ceil(length / 10)} тюбиков</p>
+          <p><strong>Расчет выполнен по СП 2.13330.2016</strong></p>
+        `;
+      }
+      // Расчет плитки
+      else if (finishType === 'tile') {
+        const area = parseFloat(document.getElementById('tile-area').value);
+        const size = document.getElementById('tile-size').value;
+        const jointWidth = document.getElementById('tile-joint-width').value;
+        const type = document.getElementById('tile-type').value;
+        const layout = document.getElementById('tile-layout').value;
+        
+        if (isNaN(area)) {
+          alert('Пожалуйста, введите площадь стен для расчета плитки');
+          return;
+        }
+        
+        // Размеры плитки в м
+        const sizeParts = size.split('x').map(d => parseFloat(d) / 1000);
+        const tileSize = sizeParts[0] * sizeParts[1];
+        
+        // Коэффициент запаса (зависит от типа укладки)
+        const reserveFactors = {
+          'straight': 1.05,
+          'diagonal': 1.15,
+          'brick': 1.1,
+          'herringbone': 1.2
+        };
+        
+        const reserveFactor = reserveFactors[layout];
+        
+        // Количество плитки
+        const tilesCount = Math.ceil((area * reserveFactor) / tileSize);
+        
+        // Расчет клея
+        const adhesive = area * 3.5; // 3.5 кг/м²
+        
+        // Расчет затирки
+        const grout = area * 0.2; // 200 г/м²
+        
+        resultText = `
+          <p><strong>Тип отделки:</strong> Плитка</p>
+          <p><strong>Площадь стен:</strong> ${area} м²</p>
+          <p><strong>Размер плитки:</strong> ${size} мм</p>
+          <p><strong>Ширина шва:</strong> ${jointWidth} мм</p>
+          <p><strong>Тип плитки:</strong> ${type === 'ceramic' ? 'Керамическая' : 
+            type === 'porcelain' ? 'Керамогранит' : 
+            type === 'glass' ? 'Стеклянная' : 'Мозаика'}</p>
+          <p><strong>Тип укладки:</strong> ${layout === 'straight' ? 'Прямая' : 
+            layout === 'diagonal' ? 'Диагональная' : 
+            layout === 'brick' ? 'Кирпичная' : 'Елочкой'}</p>
+          <p><strong>Плитка:</strong> ${tilesCount} шт.</p>
+          <p><strong>Клей для плитки:</strong> ${adhesive.toFixed(2)} кг</p>
+          <p><strong>Затирка:</strong> ${grout.toFixed(2)} кг</p>
+          <p><strong>Крестики для плитки:</strong> ${Math.ceil(area * 25)} шт.</p>
+          <p><strong>Расчет выполнен по СП 2.13330.2016</strong></p>
+        `;
+      }
+      // Расчет пола
+      else if (finishType === 'floor') {
+        const area = parseFloat(document.getElementById('floor-area').value);
+        const floorType = document.getElementById('floor-type').value;
+        
+        if (isNaN(area)) {
+          alert('Пожалуйста, введите площадь пола для расчета');
+          return;
+        }
+        
+        let resultDetails = '';
+        
+        if (floorType === 'laminate') {
+          const size = document.getElementById('laminate-size').value;
+          const thickness = document.getElementById('laminate-thickness').value;
+          const laminateClass = document.getElementById('laminate-class').value;
+          const underlayment = document.getElementById('floor-underlayment').value;
+          const underlaymentType = document.getElementById('floor-underlayment-type')?.value;
+          const underlaymentThickness = document.getElementById('floor-underlayment-thickness')?.value;
+          const adhesive = document.getElementById('floor-adhesive').value;
+          const adhesiveType = document.getElementById('floor-adhesive-type')?.value;
+          
+          // Размеры ламината в м
+          const sizeParts = size.split('x').map(d => parseFloat(d) / 1000);
+          const plankArea = sizeParts[0] * sizeParts[1];
+          
+          // Количество досок
+          const planksCount = Math.ceil((area * 1.05) / plankArea); // 5% запас
+          
+          // Расчет подложки
+          let underlaymentInfo = '';
+          if (underlayment === 'yes') {
+            underlaymentInfo = `
+              <p><strong>Подложка:</strong> ${area.toFixed(2)} м²</p>
+              <p><strong>Тип подложки:</strong> ${underlaymentType === 'cork' ? 'Пробковая' : 
+                underlaymentType === 'foam' ? 'Пенополиэтилен' : 
+                underlaymentType === 'jute' ? 'Джутовая' : 'Фетровая'}</p>
+              <p><strong>Толщина подложки:</strong> ${underlaymentThickness} мм</p>
+            `;
+          }
+          
+          // Расчет клея
+          let adhesiveInfo = '';
+          if (adhesive === 'yes') {
+            adhesiveInfo = `
+              <p><strong>Клей:</strong> ${area.toFixed(2)} м²</p>
+              <p><strong>Тип клея:</strong> ${adhesiveType === 'polyurethane' ? 'Полиуретановый' : 
+                adhesiveType === 'dispersion' ? 'Дисперсионный' : 'Эпоксидный'}</p>
+            `;
+          }
+          
+          resultDetails = `
+            <p><strong>Тип напольного покрытия:</strong> Ламинат</p>
+            <p><strong>Размер ламината:</strong> ${size} мм</p>
+            <p><strong>Толщина ламината:</strong> ${thickness} мм</p>
+            <p><strong>Класс износостойкости:</strong> ${laminateClass}</p>
+            <p><strong>Ламинат:</strong> ${planksCount} шт.</p>
+            ${underlaymentInfo}
+            ${adhesiveInfo}
+            <p><strong>Плинтус напольный:</strong> ${Math.ceil(area / 3)} м</p>
+          `;
+        }
+        else if (floorType === 'ceramic-tile') {
+          const size = document.getElementById('ceramic-tile-size').value;
+          const thickness = document.getElementById('ceramic-tile-thickness').value;
+          const underlayment = document.getElementById('floor-underlayment').value;
+          const underlaymentType = document.getElementById('floor-underlayment-type')?.value;
+          const underlaymentThickness = document.getElementById('floor-underlayment-thickness')?.value;
+          
+          // Размеры керамогранита в м
+          const sizeParts = size.split('x').map(d => parseFloat(d) / 1000);
+          const tileArea = sizeParts[0] * sizeParts[1];
+          
+          // Количество плитки
+          const tilesCount = Math.ceil((area * 1.05) / tileArea); // 5% запас
+          
+          // Расчет клея
+          const adhesive = area * 3.5; // 3.5 кг/м²
+          
+          // Расчет затирки
+          const grout = area * 0.2; // 200 г/м²
+          
+          // Расчет подложки
+          let underlaymentInfo = '';
+          if (underlayment === 'yes') {
+            underlaymentInfo = `
+              <p><strong>Подложка:</strong> ${area.toFixed(2)} м²</p>
+              <p><strong>Тип подложки:</strong> ${underlaymentType === 'cork' ? 'Пробковая' : 
+                underlaymentType === 'foam' ? 'Пенополиэтилен' : 
+                underlaymentType === 'jute' ? 'Джутовая' : 'Фетровая'}</p>
+              <p><strong>Толщина подложки:</strong> ${underlaymentThickness} мм</p>
+            `;
+          }
+          
+          resultDetails = `
+            <p><strong>Тип напольного покрытия:</strong> Керамогранит</p>
+            <p><strong>Размер керамогранита:</strong> ${size} мм</p>
+            <p><strong>Толщина керамогранита:</strong> ${thickness} мм</p>
+            <p><strong>Керамогранит:</strong> ${tilesCount} шт.</p>
+            <p><strong>Клей для плитки:</strong> ${adhesive.toFixed(2)} кг</p>
+            <p><strong>Затирка:</strong> ${grout.toFixed(2)} кг</p>
+            ${underlaymentInfo}
+            <p><strong>Крестики для плитки:</strong> ${Math.ceil(area * 25)} шт.</p>
+          `;
+        }
+        else if (floorType === 'parquet') {
+          const size = document.getElementById('parquet-size').value;
+          const underlayment = document.getElementById('floor-underlayment').value;
+          const underlaymentType = document.getElementById('floor-underlayment-type')?.value;
+          const underlaymentThickness = document.getElementById('floor-underlayment-thickness')?.value;
+          const adhesive = document.getElementById('floor-adhesive').value;
+          const adhesiveType = document.getElementById('floor-adhesive-type')?.value;
+          
+          // Размеры паркета в м
+          const sizeParts = size.split('x').map(d => parseFloat(d) / 1000);
+          const plankArea = sizeParts[0] * sizeParts[1];
+          
+          // Количество досок
+          const planksCount = Math.ceil((area * 1.08) / plankArea); // 8% запас
+          
+          // Расчет подложки
+          let underlaymentInfo = '';
+          if (underlayment === 'yes') {
+            underlaymentInfo = `
+              <p><strong>Подложка:</strong> ${area.toFixed(2)} м²</p>
+              <p><strong>Тип подложки:</strong> ${underlaymentType === 'cork' ? 'Пробковая' : 
+                underlaymentType === 'foam' ? 'Пенополиэтилен' : 
+                underlaymentType === 'jute' ? 'Джутовая' : 'Фетровая'}</p>
+              <p><strong>Толщина подложки:</strong> ${underlaymentThickness} мм</p>
+            `;
+          }
+          
+          // Расчет клея
+          let adhesiveInfo = '';
+          if (adhesive === 'yes') {
+            adhesiveInfo = `
+              <p><strong>Клей:</strong> ${area.toFixed(2)} м²</p>
+              <p><strong>Тип клея:</strong> ${adhesiveType === 'polyurethane' ? 'Полиуретановый' : 
+                adhesiveType === 'dispersion' ? 'Дисперсионный' : 'Эпоксидный'}</p>
+            `;
+          }
+          
+          resultDetails = `
+            <p><strong>Тип напольного покрытия:</strong> Паркет</p>
+            <p><strong>Размер паркета:</strong> ${size} мм</p>
+            <p><strong>Паркет:</strong> ${planksCount} шт.</p>
+            ${underlaymentInfo}
+            ${adhesiveInfo}
+            <p><strong>Плинтус напольный:</strong> ${Math.ceil(area / 3)} м</p>
+            <p><strong>Масло/лак для паркета:</strong> ${(area * 0.15).toFixed(2)} л</p>
+          `;
+        }
+        else if (floorType === 'linoleum') {
+          const width = document.getElementById('linoleum-width').value;
+          const thickness = document.getElementById('linoleum-thickness').value;
+          const adhesive = document.getElementById('floor-adhesive').value;
+          const adhesiveType = document.getElementById('floor-adhesive-type')?.value;
+          
+          // Длина рулона (для покрытия всей площади)
+          const rollLength = Math.ceil(area / width);
+          
+          // Расчет клея
+          let adhesiveInfo = '';
+          if (adhesive === 'yes') {
+            adhesiveInfo = `
+              <p><strong>Клей:</strong> ${area.toFixed(2)} м²</p>
+              <p><strong>Тип клея:</strong> ${adhesiveType === 'polyurethane' ? 'Полиуретановый' : 
+                adhesiveType === 'dispersion' ? 'Дисперсионный' : 'Эпоксидный'}</p>
+            `;
+          }
+          
+          resultDetails = `
+            <p><strong>Тип напольного покрытия:</strong> Линолеум</p>
+            <p><strong>Ширина рулона:</strong> ${width} м</p>
+            <p><strong>Толщина линолеума:</strong> ${thickness} мм</p>
+            <p><strong>Линолеум:</strong> ${rollLength} м</p>
+            ${adhesiveInfo}
+            <p><strong>Плинтус напольный:</strong> ${Math.ceil(area / 3)} м</p>
+            <p><strong>Порожки:</strong> ${Math.ceil(area / 5)} м</p>
+          `;
+        }
+        
+        resultText = `
+          ${resultDetails}
+          <p><strong>Расчет выполнен по СП 2.13330.2016</strong></p>
+        `;
+      }
+      
+      // Показываем результаты
+      document.getElementById('finish-result-text').innerHTML = resultText;
+      document.getElementById('finish-result').style.display = 'block';
+    }
+    
+    // Функция расчета забора
+    function calculateFence() {
+      const fenceType = document.getElementById('fence-type').value;
+      
+      let resultText = '';
+      
+      // Расчет забора из профлиста
+      if (fenceType === 'profile-sheet') {
+        const length = parseFloat(document.getElementById('profile-sheet-length').value);
+        const height = document.getElementById('profile-sheet-height').value;
+        const type = document.getElementById('profile-sheet-type').value;
+        const thickness = document.getElementById('profile-sheet-thickness').value;
+        const postStep = document.getElementById('profile-sheet-post-step').value;
+        const postType = document.getElementById('profile-sheet-post-type').value;
+        const postDepth = document.getElementById('profile-sheet-post-depth').value;
+        const gates = document.getElementById('profile-sheet-gates').value;
+        const gate = document.getElementById('profile-sheet-gate').value;
+        
+        if (isNaN(length)) {
+          alert('Пожалуйста, введите длину участка для расчета забора');
+          return;
+        }
+        
+        // Количество столбов
+        const postsCount = Math.ceil(length / postStep) + 1;
+        
+        // Общая длина профлиста
+        const sheetLength = length * height;
+        
+        // Расчет бетона для столбов
+        const postVolume = 0.4 * 0.4 * postDepth; // размер ямы 40×40 см
+        const totalConcrete = postsCount * postVolume;
+        
+        // Расчет ворот и калитки
+        let gatesInfo = '';
+        let gatesCount = 0;
+        let gateCount = 0;
+        
+        if (gates === 'yes') {
+          gatesCount = 1;
+          gatesInfo += `<p><strong>Ворота:</strong> 1 компл.</p>`;
+        }
+        
+        if (gate === 'yes') {
+          gateCount = 1;
+          gatesInfo += `<p><strong>Калитка:</strong> 1 шт.</p>`;
+        }
+        
+        // Общее количество материала с учетом ворот и калитки
+        const totalSheetLength = sheetLength - (gatesCount * 3 * height) - (gateCount * 1 * height);
+        
+        resultText = `
+          <p><strong>Тип забора:</strong> Профлист</p>
+          <p><strong>Длина участка:</strong> ${length} м</p>
+          <p><strong>Высота забора:</strong> ${height} м</p>
+          <p><strong>Тип профлиста:</strong> ${type}</p>
+          <p><strong>Толщина профлиста:</strong> ${thickness} мм</p>
+          <p><strong>Количество столбов:</strong> ${postsCount} шт.</p>
+          <p><strong>Тип столбов:</strong> ${postType === 'tube' ? 'Труба 60×60×2 мм' : 
+            postType === 'tube70' ? 'Труба 70×70×2 мм' : 
+            postType === 'tube80' ? 'Труба 80×80×2 мм' : 'Труба 100×100×2 мм'}</p>
+          <p><strong>Глубина установки столбов:</strong> ${postDepth} м</p>
+          <p><strong>Профлист:</strong> ${totalSheetLength.toFixed(2)} м²</p>
+          <p><strong>Бетон для столбов:</strong> ${totalConcrete.toFixed(2)} м³</p>
+          <p><strong>Цемент:</strong> ${(totalConcrete * 300).toFixed(2)} кг</p>
+          <p><strong>Песок:</strong> ${(totalConcrete * 1500).toFixed(2)} кг</p>
+          ${gatesInfo}
+          <p><strong>Саморезы:</strong> ${Math.ceil(totalSheetLength * 8)} шт.</p>
+          <p><strong>Расчет выполнен по СП 2.13330.2016</strong></p>
+        `;
+      }
+      // Расчет забора из кирпича
+      else if (fenceType === 'brick') {
+        const length = parseFloat(document.getElementById('brick-length').value);
+        const height = document.getElementById('brick-height').value;
+        const thickness = document.getElementById('brick-thickness').value;
+        const type = document.getElementById('brick-type').value;
+        const foundationType = document.getElementById('brick-foundation-type').value;
+        const gates = document.getElementById('brick-gates').value;
+        const gate = document.getElementById('brick-gate').value;
+        
+        if (isNaN(length)) {
+          alert('Пожалуйста, введите длину участка для расчета забора');
+          return;
+        }
+        
+        // Толщина кладки в метрах
+        const thicknessFactors = {
+          '0.5': 0.12,
+          '1': 0.25,
+          '1.5': 0.38,
+          '2': 0.51
+        };
+        
+        const wallThickness = thicknessFactors[thickness];
+        
+        // Объем кладки
+        const wallVolume = length * height * wallThickness;
+        
+        // Количество кирпичей (500 шт. на м³)
+        const bricksCount = Math.ceil(wallVolume * 500);
+        
+        // Расчет фундамента
+        let foundationInfo = '';
+        let concreteVolume = 0;
+        
+        if (foundationType === 'strip') {
+          const foundationWidth = parseFloat(document.getElementById('brick-foundation-width').value);
+          const foundationDepth = parseFloat(document.getElementById('brick-foundation-depth').value);
+          
+          concreteVolume = length * foundationWidth * foundationDepth;
+          
+          foundationInfo = `
+            <p><strong>Тип фундамента:</strong> Ленточный</p>
+            <p><strong>Ширина фундамента:</strong> ${foundationWidth} м</p>
+            <p><strong>Глубина фундамента:</strong> ${foundationDepth} м</p>
+          `;
+        } else if (foundationType === 'pile') {
+          const pileCount = Math.ceil(length / 3) + 1;
+          const pileDiameter = 0.3; // 30 см
+          const pileDepth = 1.0; // 1 м
+          
+          concreteVolume = pileCount * Math.PI * Math.pow(pileDiameter / 2, 2) * pileDepth;
+          
+          foundationInfo = `
+            <p><strong>Тип фундамента:</strong> Свайный</p>
+            <p><strong>Количество свай:</strong> ${pileCount} шт.</p>
+            <p><strong>Диаметр свай:</strong> ${pileDiameter} м</p>
+            <p><strong>Глубина свай:</strong> ${pileDepth} м</p>
+          `;
+        } else if (foundationType === 'slab') {
+          const slabThickness = 0.2; // 20 см
+          
+          concreteVolume = length * 0.6 * slabThickness; // ширина плиты 60 см
+          
+          foundationInfo = `
+            <p><strong>Тип фундамента:</strong> Плитный</p>
+            <p><strong>Толщина плиты:</strong> ${slabThickness} м</p>
+          `;
+        }
+        
+        // Расчет раствора
+        const mortarVolume = wallVolume * 0.25;
+        
+        // Расчет ворот и калитки
+        let gatesInfo = '';
+        let gatesCount = 0;
+        let gateCount = 0;
+        
+        if (gates === 'yes') {
+          gatesCount = 1;
+          gatesInfo += `<p><strong>Ворота:</strong> 1 компл.</p>`;
+        }
+        
+        if (gate === 'yes') {
+          gateCount = 1;
+          gatesInfo += `<p><strong>Калитка:</strong> 1 шт.</p>`;
+        }
+        
+        resultText = `
+          <p><strong>Тип забора:</strong> Кирпич</p>
+          <p><strong>Длина участка:</strong> ${length} м</p>
+          <p><strong>Высота забора:</strong> ${height} м</p>
+          <p><strong>Толщина кладки:</strong> ${thickness === '0.5' ? '0.5 кирпича (120 мм)' : 
+            thickness === '1' ? '1 кирпич (250 мм)' : 
+            thickness === '1.5' ? '1.5 кирпича (380 мм)' : '2 кирпича (510 мм)'}</p>
+          <p><strong>Тип кирпича:</strong> ${type === 'ceramic' ? 'Керамический' : 
+            type === 'silicate' ? 'Силикатный' : 
+            type === 'clinker' ? 'Клинкерный' : 'Пустотелый'}</p>
+          ${foundationInfo}
+          <p><strong>Бетон для фундамента:</strong> ${concreteVolume.toFixed(2)} м³</p>
+          <p><strong>Кирпич:</strong> ${bricksCount} шт.</p>
+          <p><strong>Раствор:</strong> ${mortarVolume.toFixed(2)} м³</p>
+          <p><strong>Цемент:</strong> ${(mortarVolume * 400).toFixed(2)} кг</p>
+          <p><strong>Песок:</strong> ${(mortarVolume * 1500).toFixed(2)} кг</p>
+          ${gatesInfo}
+          <p><strong>Расчет выполнен по СП 2.13330.2016</strong></p>
+        `;
+      }
+      // Расчет забора из профильной трубы
+      else if (fenceType === 'tube') {
+        const length = parseFloat(document.getElementById('tube-length').value);
+        const height = document.getElementById('tube-height').value;
+        const type = document.getElementById('tube-type').value;
+        const postStep = document.getElementById('tube-post-step').value;
+        const postDepth = document.getElementById('tube-post-depth').value;
+        const attachmentType = document.getElementById('tube-attachment-type').value;
+        const gates = document.getElementById('tube-gates').value;
+        const gate = document.getElementById('tube-gate').value;
+        
+        if (isNaN(length)) {
+          alert('Пожалуйста, введите длину участка для расчета забора');
+          return;
+        }
+        
+        // Количество столбов
+        const postsCount = Math.ceil(length / postStep) + 1;
+        
+        // Общая длина профильной трубы для каркаса
+        const frameTubeLength = length * 2; // два горизонтальных элемента
+        
+        // Расчет бетона для столбов
+        const postVolume = 0.4 * 0.4 * postDepth; // размер ямы 40×40 см
+        const totalConcrete = postsCount * postVolume;
+        
+        // Расчет ворот и калитки
+        let gatesInfo = '';
+        let gatesCount = 0;
+        let gateCount = 0;
+        
+        if (gates === 'yes') {
+          gatesCount = 1;
+          gatesInfo += `<p><strong>Ворота:</strong> 1 компл.</p>`;
+        }
+        
+        if (gate === 'yes') {
+          gateCount = 1;
+          gatesInfo += `<p><strong>Калитка:</strong> 1 шт.</p>`;
+        }
+        
+        resultText = `
+          <p><strong>Тип забора:</strong> Профильная труба</p>
+          <p><strong>Длина участка:</strong> ${length} м</p>
+          <p><strong>Высота забора:</strong> ${height} м</p>
+          <p><strong>Тип профильной трубы:</strong> ${type}</p>
+          <p><strong>Количество столбов:</strong> ${postsCount} шт.</p>
+          <p><strong>Шаг столбов:</strong> ${postStep} м</p>
+          <p><strong>Глубина установки столбов:</strong> ${postDepth} м</p>
+          <p><strong>Тип крепления:</strong> ${attachmentType === 'welding' ? 'Сварка' : 'Болты'}</p>
+          <p><strong>Профильная труба для каркаса:</strong> ${frameTubeLength} м</p>
+          <p><strong>Бетон для столбов:</strong> ${totalConcrete.toFixed(2)} м³</p>
+          <p><strong>Цемент:</strong> ${(totalConcrete * 300).toFixed(2)} кг</p>
+          <p><strong>Песок:</strong> ${(totalConcrete * 1500).toFixed(2)} кг</p>
+          ${gatesInfo}
+          ${attachmentType === 'welding' ? 
+            `<p><strong>Электроды:</strong> ${Math.ceil(frameTubeLength / 0.5)} шт.</p>` : 
+            `<p><strong>Болты:</strong> ${Math.ceil(frameTubeLength * 2)} шт.</p>`}
+          <p><strong>Грунтовка:</strong> ${(postsCount * 2 + frameTubeLength * 0.5).toFixed(2)} л</p>
+          <p><strong>Краска:</strong> ${(postsCount * 2 + frameTubeLength * 0.5).toFixed(2)} л</p>
+          <p><strong>Расчет выполнен по СП 2.13330.2016</strong></p>
+        `;
+      }
+      
+      // Показываем результаты
+      document.getElementById('fence-result-text').innerHTML = resultText;
+      document.getElementById('fence-result').style.display = 'block';
+    }
+    
+    // Функция для инициализации приложения
+    function initApp() {
+      createStars();
+      
+      // Установка обработчиков событий
+      document.getElementById('facade-insulation').addEventListener('change', function() {
+        const insulationGroup = document.getElementById('insulation-thickness-group');
+        insulationGroup.style.display = this.value === 'yes' ? 'block' : 'none';
+      });
+      
+      document.getElementById('floor-underlayment').addEventListener('change', function() {
+        const underlaymentTypeGroup = document.getElementById('underlayment-type-group');
+        const underlaymentThicknessGroup = document.getElementById('underlayment-thickness-group');
+        
+        if (this.value === 'yes') {
+          underlaymentTypeGroup.style.display = 'block';
+          underlaymentThicknessGroup.style.display = 'block';
+        } else {
+          underlaymentTypeGroup.style.display = 'none';
+          underlaymentThicknessGroup.style.display = 'none';
+        }
+      });
+      
+      document.getElementById('floor-adhesive').addEventListener('change', function() {
+        const adhesiveTypeGroup = document.getElementById('adhesive-type-group');
+        
+        if (this.value === 'yes') {
+          adhesiveTypeGroup.style.display = 'block';
+        } else {
+          adhesiveTypeGroup.style.display = 'none';
+        }
+      });
+      
+      document.getElementById('brick-foundation-type').addEventListener('change', function() {
+        const foundationType = this.value;
+        const stripFields = document.getElementById('brick-strip-foundation');
+        
+        if (foundationType === 'strip') {
+          stripFields.style.display = 'block';
+        } else {
+          stripFields.style.display = 'none';
+        }
+      });
+      
+      // Показываем главное меню по умолчанию
+      showSection('main-menu');
+      
+      // Плавная прокрутка
+      document.querySelectorAll('.submenu, .calculator-container').forEach(container => {
+        container.addEventListener('touchstart', function(e) {
+          this.startY = e.touches[0].clientY;
+        });
+        
+        container.addEventListener('touchmove', function(e) {
+          if (!this.startY) return;
+          
+          const deltaY = e.touches[0].clientY - this.startY;
+          this.scrollTop -= deltaY;
+          this.startY = e.touches[0].clientY;
+          e.preventDefault();
+        });
+      });
+    }
+    
+    // Инициализация при загрузке страницы
+    window.onload = initApp;
+  </script>
+</body>
+</html>

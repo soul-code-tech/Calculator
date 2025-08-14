@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Электрика - Инженерный калькулятор</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #e0e0e0;
+      text-align: center;
+      min-height: 100vh;
+      padding: 15px;
+      position: relative;
+      overflow: hidden;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Эффект мерцающих звезд в фоне */
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .star {
+      position: absolute;
+      background: #ffffff;
+      border-radius: 50%;
+      animation: twinkle 3s infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.8; }
+    }
+
+    .page {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .container {
+      max-width: 100%;
+      margin: 15px auto;
+      padding: 20px 15px;
+      background: rgba(15, 25, 35, 0.85);
+      border: 2px solid #FF9800;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(255, 152, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #FF9800, transparent);
+    }
+
+    .container::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #FF9800, transparent);
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: #FF9800;
+      font-size: 1.8em;
+      text-shadow: 0 0 10px rgba(255, 152, 0, 0.6);
+      margin-bottom: 15px;
+      position: relative;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    h1::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #FF9800, transparent);
+      margin: 10px auto;
+    }
+
+    .subtitle {
+      font-size: 1.1em;
+      color: #b0bec5;
+      margin-bottom: 20px;
+      font-weight: 300;
+      line-height: 1.4;
+    }
+
+    .submenu {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin: 20px 0;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #FF9800 rgba(30, 40, 50, 0.7);
+    }
+
+    .submenu::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .submenu::-webkit-scrollbar-track {
+      background: rgba(30, 40, 50, 0.5);
+      border-radius: 4px;
+    }
+
+    .submenu::-webkit-scrollbar-thumb {
+      background: #FF9800;
+      border-radius: 4px;
+    }
+
+    .submenu::-webkit-scrollbar-thumb:hover {
+      background: #FFB74D;
+    }
+
+    .submenu-item {
+      background: rgba(30, 40, 50, 0.7);
+      border: 1px solid #FF9800;
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .submenu-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 15px rgba(255, 152, 0, 0.4);
+      background: rgba(40, 50, 60, 0.8);
+    }
+
+    .submenu-item::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px;
+      height: 100%;
+      background: #FF9800;
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+    }
+
+    .submenu-item:hover::before {
+      transform: scaleY(1);
+    }
+
+    .submenu-icon {
+      font-size: 2.2em;
+      width: 50px;
+      text-align: center;
+      color: #FF9800;
+      transition: all 0.3s ease;
+    }
+
+    .submenu-item:hover .submenu-icon {
+      transform: scale(1.2);
+    }
+
+    .submenu-title {
+      font-family: 'Orbitron', sans-serif;
+      color: #FF9800;
+      font-size: 1.3em;
+      margin-bottom: 8px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .submenu-description {
+      color: #b0bec5;
+      font-size: 1em;
+      line-height: 1.4;
+      font-weight: 300;
+    }
+
+    .calculator-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px 0;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #FF9800 rgba(30, 40, 50, 0.7);
+    }
+
+    .calculator-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .calculator-container::-webkit-scrollbar-track {
+      background: rgba(30, 40, 50, 0.5);
+      border-radius: 4px;
+    }
+
+    .calculator-container::-webkit-scrollbar-thumb {
+      background: #FF9800;
+      border-radius: 4px;
+    }
+
+    .calculator-container::-webkit-scrollbar-thumb:hover {
+      background: #FFB74D;
+    }
+
+    .input-group {
+      width: 100%;
+      max-width: 300px;
+      margin: 15px 0;
+    }
+
+    .input-label {
+      display: block;
+      text-align: left;
+      margin-bottom: 6px;
+      color: #FF9800;
+      font-weight: 500;
+      font-size: 1.05em;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      background: rgba(30, 40, 50, 0.7);
+      border: 1px solid #FF9800;
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-family: 'Roboto', sans-serif;
+      font-size: 1.1em;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #FFB74D;
+      box-shadow: 0 0 8px rgba(255, 183, 77, 0.3);
+    }
+
+    .btn-calculator {
+      background: #FF9800;
+      color: #1a0d00;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-family: 'Roboto', sans-serif;
+      font-size: 1.1em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 15px 0;
+      width: 100%;
+      max-width: 300px;
+      box-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+    }
+
+    .btn-calculator:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 15px rgba(255, 152, 0, 0.7);
+    }
+
+    .result-container {
+      background: rgba(30, 40, 50, 0.7);
+      border: 1px solid #FF9800;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 20px 0;
+      width: 100%;
+      max-width: 300px;
+      text-align: left;
+      box-shadow: 0 0 10px rgba(255, 152, 0, 0.2);
+      display: none;
+    }
+
+    .result-title {
+      font-family: 'Orbitron', sans-serif;
+      color: #FF9800;
+      font-size: 1.4em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .result-text {
+      color: #e0e0e0;
+      line-height: 1.5;
+      font-size: 1.05em;
+    }
+
+    .info-box {
+      background: rgba(30, 40, 50, 0.5);
+      border: 1px solid #FF9800;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 15px 0;
+      text-align: left;
+      font-size: 0.95em;
+      line-height: 1.4;
+    }
+
+    .info-title {
+      color: #FF9800;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .nav-buttons {
+      margin: 20px auto 10px;
+      display: flex;
+      justify-content: space-between;
+      max-width: 100%;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn-back, .btn-home {
+      display: inline-block;
+      padding: 12px 20px;
+      background: rgba(255, 152, 0, 0.25);
+      color: #FF9800;
+      text-decoration: none;
+      border: 1px solid #FF9800;
+      border-radius: 10px;
+      font-size: 1.1em;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 8px rgba(255, 152, 0, 0.3);
+      min-width: 120px;
+      flex: 1;
+    }
+
+    .btn-back:hover, .btn-home:hover {
+      background: rgba(255, 152, 0, 0.4);
+      transform: scale(1.03);
+      box-shadow: 0 0 15px rgba(255, 152, 0, 0.4);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Адаптация для мобильных устройств */
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px 10px;
+        border-radius: 16px;
+      }
+      
+      .input-field {
+        font-size: 1.05em;
+      }
+      
+      .btn-calculator {
+        font-size: 1.05em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  
+  <div class="container">
+    <!-- Главное меню электрики -->
+    <div id="main-menu" class="page">
+      <h1>⚡ Электрика</h1>
+      <p class="subtitle">Расчеты по СП 25.13330.2016</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация:</div>
+        <p>Все расчеты выполняются по действующим нормативным документам РФ</p>
+        <p>СП 25.13330.2016 (Актуализированная редакция СНиП 3.03.01-87)</p>
+      </div>
+      
+      <div class="submenu">
+        <div class="submenu-item" onclick="showSection('parameters')">
+          <div class="submenu-icon">📊</div>
+          <div>
+            <div class="submenu-title">Параметры сети</div>
+            <div class="submenu-description">Напряжение, ток, мощность</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('cable-section')">
+          <div class="submenu-icon"> wireType </div>
+          <div>
+            <div class="submenu-title">Сечение кабеля</div>
+            <div class="submenu-description">По току или мощности</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('protection')">
+          <div class="submenu-icon">🛡️</div>
+          <div>
+            <div class="submenu-title">Устройства защиты</div>
+            <div class="submenu-description">Автоматы, УЗО, дифавтоматы</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('power')">
+          <div class="submenu-icon">⚡</div>
+          <div>
+            <div class="submenu-title">Активная и реактивная мощность</div>
+            <div class="submenu-description">Коэффициент мощности, cos φ</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('motor')">
+          <div class="submenu-icon">🌀</div>
+          <div>
+            <div class="submenu-title">Подбор электродвигателя</div>
+            <div class="submenu-description">Мощность, напряжение, тип</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('capacitor')">
+          <div class="submenu-icon">🔋</div>
+          <div>
+            <div class="submenu-title">Конденсатор для двигателя</div>
+            <div class="submenu-description">Переделка 3-фазного в 1-фазный</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('grounding')">
+          <div class="submenu-icon">⏚</div>
+          <div>
+            <div class="submenu-title">Заземление</div>
+            <div class="submenu-description">Расчет сопротивления, разность потенциалов</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="index.html" class="btn-back">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Параметры сети -->
+    <div id="parameters" class="page hidden">
+      <h1>📊 Параметры сети</h1>
+      <p class="subtitle">Расчет по СП 25.13330.2016</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Расчет производится по СП 25.13330.2016 (Актуализированная редакция СНиП 3.03.01-87)</p>
+        <p>Рассчитывает недостающие параметры сети на основе введенных данных</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Тип сети:</label>
+          <select class="input-field" id="network-type" onchange="toggleNetworkFields()">
+            <option value="single-phase">Однофазная</option>
+            <option value="three-phase">Трехфазная</option>
+          </select>
+        </div>
+        
+        <div id="single-phase-fields">
+          <div class="input-group">
+            <label class="input-label">Напряжение (В):</label>
+            <input type="number" class="input-field" id="voltage-single" placeholder="Введите напряжение" value="220">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Ток (А):</label>
+            <input type="number" class="input-field" id="current-single" placeholder="Введите ток" value="16">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Мощность (Вт):</label>
+            <input type="number" class="input-field" id="power-single" placeholder="Введите мощность">
+          </div>
+        </div>
+        
+        <div id="three-phase-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Напряжение (В):</label>
+            <input type="number" class="input-field" id="voltage-three" placeholder="Введите напряжение" value="380">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Ток (А):</label>
+            <input type="number" class="input-field" id="current-three" placeholder="Введите ток" value="16">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Мощность (Вт):</label>
+            <input type="number" class="input-field" id="power-three" placeholder="Введите мощность">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Коэффициент мощности (cos φ):</label>
+            <input type="number" class="input-field" id="power-factor" placeholder="Введите cos φ" value="0.85" min="0" max="1" step="0.01">
+          </div>
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateParameters()">
+          Рассчитать параметры
+        </button>
+        
+        <div class="result-container" id="parameters-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="parameters-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Сечение кабеля -->
+    <div id="cable-section" class="page hidden">
+      <h1> wireType  Сечение кабеля</h1>
+      <p class="subtitle">Расчет по ПУЭ 7 изд.</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Расчет производится по Правилам устройства электроустановок (ПУЭ)</p>
+        <p>Учитывается материал проводника, длина линии, допустимые потери</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Тип расчета:</label>
+          <select class="input-field" id="cable-calculation-type" onchange="toggleCableCalculationType()">
+            <option value="power">По мощности</option>
+            <option value="current">По току</option>
+          </select>
+        </div>
+        
+        <div id="cable-by-power">
+          <div class="input-group">
+            <label class="input-label">Мощность (кВт):</label>
+            <input type="number" class="input-field" id="cable-power" placeholder="Введите мощность" value="3.5">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Напряжение (В):</label>
+            <select class="input-field" id="cable-voltage">
+              <option value="220">220 В (однофазная)</option>
+              <option value="380">380 В (трехфазная)</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Длина линии (м):</label>
+            <input type="number" class="input-field" id="cable-length" placeholder="Введите длину" value="25">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Материал проводника:</label>
+            <select class="input-field" id="cable-material">
+              <option value="copper">Медь</option>
+              <option value="aluminum">Алюминий</option>
+            </select>
+          </div>
+        </div>
+        
+        <div id="cable-by-current" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Ток (А):</label>
+            <input type="number" class="input-field" id="cable-current" placeholder="Введите ток" value="16">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Напряжение (В):</label>
+            <select class="input-field" id="cable-current-voltage">
+              <option value="220">220 В (однофазная)</option>
+              <option value="380">380 В (трехфазная)</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Длина линии (м):</label>
+            <input type="number" class="input-field" id="cable-current-length" placeholder="Введите длину" value="25">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Материал проводника:</label>
+            <select class="input-field" id="cable-current-material">
+              <option value="copper">Медь</option>
+              <option value="aluminum">Алюминий</option>
+            </select>
+          </div>
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateCableSection()">
+          Рассчитать сечение
+        </button>
+        
+        <div class="result-container" id="cable-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="cable-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Устройства защиты -->
+    <div id="protection" class="page hidden">
+      <h1>🛡️ Устройства защиты</h1>
+      <p class="subtitle">Расчет по ПУЭ 7 изд.</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Расчет производится по Правилам устройства электроустановок (ПУЭ)</p>
+        <p>Учитывается тип нагрузки, сечение кабеля, номинальный ток</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Тип защиты:</label>
+          <select class="input-field" id="protection-type">
+            <option value="circuit-breaker">Автоматический выключатель</option>
+            <option value="rcc">УЗО</option>
+            <option value="dif">Дифавтомат</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Напряжение сети (В):</label>
+          <select class="input-field" id="protection-voltage">
+            <option value="220">220 В (однофазная)</option>
+            <option value="380">380 В (трехфазная)</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Ток нагрузки (А):</label>
+          <input type="number" class="input-field" id="protection-current" placeholder="Введите ток" value="16">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Сечение кабеля (мм²):</label>
+          <input type="number" class="input-field" id="protection-cable-section" placeholder="Введите сечение" value="2.5">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Тип нагрузки:</label>
+          <select class="input-field" id="protection-load-type">
+            <option value="resistive">Активная (освещение, нагреватели)</option>
+            <option value="inductive">Индуктивная (двигатели, трансформаторы)</option>
+            <option value="mixed">Смешанная</option>
+          </select>
+        </div>
+        
+        <div id="rcc-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Ток утечки (мА):</label>
+            <select class="input-field" id="rcc-leakage-current">
+              <option value="10">10 мА (повышенная чувствительность)</option>
+              <option value="30" selected>30 мА (стандартная)</option>
+              <option value="100">100 мА (противопожарная)</option>
+            </select>
+          </div>
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateProtection()">
+          Подобрать защиту
+        </button>
+        
+        <div class="result-container" id="protection-result">
+          <div class="result-title">Рекомендации</div>
+          <div class="result-text" id="protection-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Активная и реактивная мощность -->
+    <div id="power" class="page hidden">
+      <h1>⚡ Активная и реактивная мощность</h1>
+      <p class="subtitle">Расчет по СП 25.13330.2016</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Расчет производится по СП 25.13330.2016 (Актуализированная редакция СНиП 3.03.01-87)</p>
+        <p>Учитывается коэффициент мощности и тип нагрузки</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Тип расчета:</label>
+          <select class="input-field" id="power-calculation-type" onchange="togglePowerCalculationType()">
+            <option value="to-power">По напряжению и току</option>
+            <option value="to-current">По мощности и напряжению</option>
+          </select>
+        </div>
+        
+        <div id="power-by-voltage-current">
+          <div class="input-group">
+            <label class="input-label">Напряжение (В):</label>
+            <input type="number" class="input-field" id="power-voltage" placeholder="Введите напряжение" value="220">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Ток (А):</label>
+            <input type="number" class="input-field" id="power-current" placeholder="Введите ток" value="10">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Коэффициент мощности (cos φ):</label>
+            <input type="number" class="input-field" id="power-factor-calc" placeholder="Введите cos φ" value="0.85" min="0" max="1" step="0.01">
+          </div>
+        </div>
+        
+        <div id="power-by-power" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Полная мощность (ВА):</label>
+            <input type="number" class="input-field" id="power-total" placeholder="Введите полную мощность" value="2200">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Коэффициент мощности (cos φ):</label>
+            <input type="number" class="input-field" id="power-factor-power" placeholder="Введите cos φ" value="0.85" min="0" max="1" step="0.01">
+          </div>
+        </div>
+        
+        <button class="btn-calculator" onclick="calculatePower()">
+          Рассчитать мощность
+        </button>
+        
+        <div class="result-container" id="power-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="power-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Подбор электродвигателя -->
+    <div id="motor" class="page hidden">
+      <h1>🌀 Подбор электродвигателя</h1>
+      <p class="subtitle">Расчет по ГОСТ Р МЭК 60034-1-2014</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Расчет производится по ГОСТ Р МЭК 60034-1-2014</p>
+        <p>Учитывается мощность, напряжение, тип нагрузки</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Требуемая мощность (кВт):</label>
+          <input type="number" class="input-field" id="motor-power" placeholder="Введите мощность" value="1.5">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Напряжение сети (В):</label>
+          <select class="input-field" id="motor-voltage">
+            <option value="220">220 В (однофазная)</option>
+            <option value="380" selected>380 В (трехфазная)</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Тип двигателя:</label>
+          <select class="input-field" id="motor-type">
+            <option value="asynchronous">Асинхронный</option>
+            <option value="synchronous">Синхронный</option>
+            <option value="dc">Постоянного тока</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Тип нагрузки:</label>
+          <select class="input-field" id="motor-load-type">
+            <option value="constant">Постоянная</option>
+            <option value="variable">Переменная</option>
+            <option value="high-start">Высокий пусковой момент</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Частота вращения (об/мин):</label>
+          <select class="input-field" id="motor-speed">
+            <option value="3000">3000</option>
+            <option value="1500" selected>1500</option>
+            <option value="1000">1000</option>
+            <option value="750">750</option>
+          </select>
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateMotor()">
+          Подобрать двигатель
+        </button>
+        
+        <div class="result-container" id="motor-result">
+          <div class="result-title">Рекомендации</div>
+          <div class="result-text" id="motor-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Конденсатор для двигателя -->
+    <div id="capacitor" class="page hidden">
+      <h1>🔋 Конденсатор для двигателя</h1>
+      <p class="subtitle">Расчет по ГОСТ Р МЭК 60252-1-2008</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Расчет производится по ГОСТ Р МЭК 60252-1-2008</p>
+        <p>Расчет емкости конденсатора для переделки трехфазного двигателя на однофазную сеть</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Мощность двигателя (кВт):</label>
+          <input type="number" class="input-field" id="capacitor-power" placeholder="Введите мощность" value="0.75">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Номинальное напряжение (В):</label>
+          <input type="number" class="input-field" id="capacitor-voltage" placeholder="Введите напряжение" value="380">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Номинальный ток (А):</label>
+          <input type="number" class="input-field" id="capacitor-current" placeholder="Введите ток" value="1.6">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Частота сети (Гц):</label>
+          <select class="input-field" id="capacitor-frequency">
+            <option value="50" selected>50 Гц</option>
+            <option value="60">60 Гц</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Тип конденсатора:</label>
+          <select class="input-field" id="capacitor-type">
+            <option value="running">Рабочий</option>
+            <option value="starting">Пусковой</option>
+            <option value="both">Рабочий и пусковой</option>
+          </select>
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateCapacitor()">
+          Рассчитать конденсатор
+        </button>
+        
+        <div class="result-container" id="capacitor-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="capacitor-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Заземление -->
+    <div id="grounding" class="page hidden">
+      <h1>⏚ Заземление</h1>
+      <p class="subtitle">Расчет по ПУЭ 7 изд.</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Расчет производится по Правилам устройства электроустановок (ПУЭ)</p>
+        <p>Учитывается тип грунта, глубина заложения, допустимое сопротивление</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Тип электроустановки:</label>
+          <select class="input-field" id="grounding-type">
+            <option value="residential">Жилые здания</option>
+            <option value="industrial">Промышленные установки</option>
+            <option value="transformer">Трансформаторные подстанции</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Напряжение сети (В):</label>
+          <select class="input-field" id="grounding-voltage">
+            <option value="220">220 В</option>
+            <option value="380">380 В</option>
+            <option value="6000">6 кВ</option>
+            <option value="10000">10 кВ</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Тип грунта:</label>
+          <select class="input-field" id="grounding-soil">
+            <option value="clay">Глина</option>
+            <option value="silt">Суглинок</option>
+            <option value="sand">Песок</option>
+            <option value="rock">Скальный грунт</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Климатическая зона:</label>
+          <select class="input-field" id="grounding-climate">
+            <option value="1">I зона (средняя температура января от -5°С до 0°С)</option>
+            <option value="2" selected>II зона (средняя температура января от -10°С до -5°С)</option>
+            <option value="3">III зона (средняя температура января от -15°С до -10°С)</option>
+            <option value="4">IV зона (средняя температура января ниже -15°С)</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Допустимое сопротивление (Ом):</label>
+          <input type="number" class="input-field" id="grounding-resistance" placeholder="Введите сопротивление" value="4" readonly>
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateGrounding()">
+          Рассчитать заземление
+        </button>
+        
+        <div class="result-container" id="grounding-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="grounding-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Создаем мерцающие звезды
+    function createStars() {
+      const starsContainer = document.getElementById('stars');
+      const starCount = 80;
+      
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        
+        // Случайные параметры для звезд
+        const size = Math.random() * 2.5;
+        const posX = Math.random() * 100;
+        const posY = Math.random() * 100;
+        const delay = Math.random() * 4;
+        const duration = 2 + Math.random() * 4;
+        
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${posX}%`;
+        star.style.top = `${posY}%`;
+        star.style.animationDelay = `${delay}s`;
+        star.style.animationDuration = `${duration}s`;
+        
+        starsContainer.appendChild(star);
+      }
+    }
+    
+    // Функция для переключения между разделами
+    function showSection(sectionId) {
+      // Скрыть все разделы
+      document.querySelectorAll('.page').forEach(section => {
+        section.classList.add('hidden');
+      });
+      
+      // Показать нужный раздел
+      document.getElementById(sectionId).classList.remove('hidden');
+      
+      // Прокрутка вверх
+      window.scrollTo(0, 0);
+    }
+    
+    // Показать/скрыть поля в зависимости от типа сети
+    function toggleNetworkFields() {
+      const networkType = document.getElementById('network-type').value;
+      
+      // Скрыть все поля
+      document.getElementById('single-phase-fields').classList.remove('hidden');
+      document.getElementById('three-phase-fields').classList.add('hidden');
+      
+      // Показать нужные поля
+      if (networkType === 'three-phase') {
+        document.getElementById('single-phase-fields').classList.add('hidden');
+        document.getElementById('three-phase-fields').classList.remove('hidden');
+      }
+    }
+    
+    // Показать/скрыть поля в зависимости от типа расчета кабеля
+    function toggleCableCalculationType() {
+      const calculationType = document.getElementById('cable-calculation-type').value;
+      
+      // Скрыть все поля
+      document.getElementById('cable-by-power').classList.remove('hidden');
+      document.getElementById('cable-by-current').classList.add('hidden');
+      
+      // Показать нужные поля
+      if (calculationType === 'current') {
+        document.getElementById('cable-by-power').classList.add('hidden');
+        document.getElementById('cable-by-current').classList.remove('hidden');
+      }
+    }
+    
+    // Показать/скрыть поля в зависимости от типа расчета мощности
+    function togglePowerCalculationType() {
+      const calculationType = document.getElementById('power-calculation-type').value;
+      
+      // Скрыть все поля
+      document.getElementById('power-by-voltage-current').classList.remove('hidden');
+      document.getElementById('power-by-power').classList.add('hidden');
+      
+      // Показать нужные поля
+      if (calculationType === 'to-power') {
+        document.getElementById('power-by-voltage-current').classList.remove('hidden');
+        document.getElementById('power-by-power').classList.add('hidden');
+      } else {
+        document.getElementById('power-by-voltage-current').classList.add('hidden');
+        document.getElementById('power-by-power').classList.remove('hidden');
+      }
+    }
+    
+    // Функция расчета параметров сети
+    function calculateParameters() {
+      const networkType = document.getElementById('network-type').value;
+      
+      let resultText = '';
+      
+      if (networkType === 'single-phase') {
+        const voltage = parseFloat(document.getElementById('voltage-single').value);
+        const current = parseFloat(document.getElementById('current-single').value);
+        const powerInput = parseFloat(document.getElementById('power-single').value);
+        const powerFactor = 0.85; // Стандартный коэффициент для однофазной сети
+        
+        let power = 0;
+        let calculatedCurrent = 0;
+        let calculatedPower = 0;
+        
+        // Если известны напряжение и ток
+        if (!isNaN(voltage) && !isNaN(current)) {
+          calculatedPower = voltage * current * powerFactor;
+          power = calculatedPower;
+        }
+        
+        // Если известны напряжение и мощность
+        if (!isNaN(voltage) && !isNaN(powerInput)) {
+          calculatedCurrent = powerInput / (voltage * powerFactor);
+          power = powerInput;
+        }
+        
+        // Если известны ток и мощность
+        if (!isNaN(current) && !isNaN(powerInput)) {
+          // Не может быть одновременно известно ток и мощность без напряжения
+          calculatedCurrent = current;
+          power = powerInput;
+        }
+        
+        resultText = `
+          <p><strong>Тип сети:</strong> Однофазная</p>
+          <p><strong>Напряжение:</strong> ${voltage} В</p>
+          <p><strong>Ток:</strong> ${calculatedCurrent.toFixed(2)} А</p>
+          <p><strong>Мощность:</strong> ${power.toFixed(2)} Вт</p>
+          <p><strong>Коэффициент мощности:</strong> ${powerFactor}</p>
+          <p><strong>Полная мощность:</strong> ${(voltage * calculatedCurrent).toFixed(2)} ВА</p>
+          <p><strong>Расчет выполнен по СП 25.13330.2016</strong></p>
+        `;
+      } else {
+        const voltage = parseFloat(document.getElementById('voltage-three').value);
+        const current = parseFloat(document.getElementById('current-three').value);
+        const powerInput = parseFloat(document.getElementById('power-three').value);
+        const powerFactor = parseFloat(document.getElementById('power-factor').value);
+        
+        let power = 0;
+        let calculatedCurrent = 0;
+        let calculatedPower = 0;
+        
+        // Если известны напряжение и ток
+        if (!isNaN(voltage) && !isNaN(current)) {
+          calculatedPower = Math.sqrt(3) * voltage * current * powerFactor;
+          power = calculatedPower;
+        }
+        
+        // Если известны напряжение и мощность
+        if (!isNaN(voltage) && !isNaN(powerInput)) {
+          calculatedCurrent = powerInput / (Math.sqrt(3) * voltage * powerFactor);
+          power = powerInput;
+        }
+        
+        // Если известны ток и мощность
+        if (!isNaN(current) && !isNaN(powerInput)) {
+          // Не может быть одновременно известно ток и мощность без напряжения
+          calculatedCurrent = current;
+          power = powerInput;
+        }
+        
+        resultText = `
+          <p><strong>Тип сети:</strong> Трехфазная</p>
+          <p><strong>Напряжение:</strong> ${voltage} В</p>
+          <p><strong>Ток:</strong> ${calculatedCurrent.toFixed(2)} А</p>
+          <p><strong>Мощность:</strong> ${power.toFixed(2)} Вт</p>
+          <p><strong>Коэффициент мощности:</strong> ${powerFactor}</p>
+          <p><strong>Полная мощность:</strong> ${(Math.sqrt(3) * voltage * calculatedCurrent).toFixed(2)} ВА</p>
+          <p><strong>Расчет выполнен по СП 25.13330.2016</strong></p>
+        `;
+      }
+      
+      // Показываем результаты
+      document.getElementById('parameters-result-text').innerHTML = resultText;
+      document.getElementById('parameters-result').style.display = 'block';
+    }
+    
+    // Функция расчета сечения кабеля
+    function calculateCableSection() {
+      const calculationType = document.getElementById('cable-calculation-type').value;
+      
+      let resultText = '';
+      
+      if (calculationType === 'power') {
+        const power = parseFloat(document.getElementById('cable-power').value);
+        const voltage = parseInt(document.getElementById('cable-voltage').value);
+        const length = parseFloat(document.getElementById('cable-length').value);
+        const material = document.getElementById('cable-material').value;
+        
+        if (isNaN(power) || isNaN(length)) {
+          alert('Пожалуйста, введите все значения для расчета сечения кабеля');
+          return;
+        }
+        
+        // Коэффициенты для расчета
+        const copperConductivity = 57; // м/(Ом·мм²)
+        const aluminumConductivity = 34; // м/(Ом·мм²)
+        const maxVoltageDrop = 0.05; // 5% допустимая потеря напряжения
+        
+        // Расчет тока
+        let current = 0;
+        if (voltage === 220) {
+          current = power * 1000 / voltage; // кВт в Вт
+        } else {
+          current = power * 1000 / (Math.sqrt(3) * voltage); // кВт в Вт
+        }
+        
+        // Расчет сечения
+        let section = 0;
+        let conductivity = material === 'copper' ? copperConductivity : aluminumConductivity;
+        
+        if (voltage === 220) {
+          // Для однофазной сети
+          section = (2 * length * current) / (conductivity * voltage * maxVoltageDrop);
+        } else {
+          // Для трехфазной сети
+          section = (Math.sqrt(3) * length * current) / (conductivity * voltage * maxVoltageDrop);
+        }
+        
+        // Округление до стандартного сечения
+        const standardSections = [0.5, 0.75, 1, 1.5, 2.5, 4, 6, 10, 16, 25, 35, 50];
+        let selectedSection = standardSections[0];
+        for (let i = 0; i < standardSections.length; i++) {
+          if (standardSections[i] >= section) {
+            selectedSection = standardSections[i];
+            break;
+          }
+        }
+        
+        // Проверка по допустимому току
+        let maxCurrent = 0;
+        if (material === 'copper') {
+          if (selectedSection <= 1.5) maxCurrent = 19;
+          else if (selectedSection <= 2.5) maxCurrent = 27;
+          else if (selectedSection <= 4) maxCurrent = 36;
+          else if (selectedSection <= 6) maxCurrent = 46;
+          else if (selectedSection <= 10) maxCurrent = 70;
+          else maxCurrent = 90;
+        } else {
+          if (selectedSection <= 2.5) maxCurrent = 20;
+          else if (selectedSection <= 4) maxCurrent = 28;
+          else if (selectedSection <= 6) maxCurrent = 36;
+          else if (selectedSection <= 10) maxCurrent = 50;
+          else maxCurrent = 80;
+        }
+        
+        // Проверка на соответствие
+        const isSuitable = current <= maxCurrent;
+        
+        resultText = `
+          <p><strong>Тип расчета:</strong> По мощности</p>
+          <p><strong>Мощность:</strong> ${power} кВт</p>
+          <p><strong>Напряжение:</strong> ${voltage} В</p>
+          <p><strong>Длина линии:</strong> ${length} м</p>
+          <p><strong>Материал проводника:</strong> ${material === 'copper' ? 'Медь' : 'Алюминий'}</p>
+          <p><strong>Требуемое сечение:</strong> ${section.toFixed(2)} мм²</p>
+          <p><strong>Рекомендуемое сечение:</strong> ${selectedSection} мм²</p>
+          <p><strong>Допустимый ток для сечения:</strong> ${maxCurrent} А</p>
+          <p><strong>Требуемый ток:</strong> ${current.toFixed(2)} А</p>
+          <p><strong>Соответствует требованиям:</strong> ${isSuitable ? 'Да' : 'Нет'}</p>
+          <p><strong>Расчет выполнен по ПУЭ 7 изд.</strong></p>
+        `;
+      } else {
+        const current = parseFloat(document.getElementById('cable-current').value);
+        const voltage = parseInt(document.getElementById('cable-current-voltage').value);
+        const length = parseFloat(document.getElementById('cable-current-length').value);
+        const material = document.getElementById('cable-current-material').value;
+        
+        if (isNaN(current) || isNaN(length)) {
+          alert('Пожалуйста, введите все значения для расчета сечения кабеля');
+          return;
+        }
+        
+        // Коэффициенты для расчета
+        const copperConductivity = 57; // м/(Ом·мм²)
+        const aluminumConductivity = 34; // м/(Ом·мм²)
+        const maxVoltageDrop = 0.05; // 5% допустимая потеря напряжения
+        
+        // Расчет сечения
+        let section = 0;
+        let conductivity = material === 'copper' ? copperConductivity : aluminumConductivity;
+        
+        if (voltage === 220) {
+          // Для однофазной сети
+          section = (2 * length * current) / (conductivity * voltage * maxVoltageDrop);
+        } else {
+          // Для трехфазной сети
+          section = (Math.sqrt(3) * length * current) / (conductivity * voltage * maxVoltageDrop);
+        }
+        
+        // Округление до стандартного сечения
+        const standardSections = [0.5, 0.75, 1, 1.5, 2.5, 4, 6, 10, 16, 25, 35, 50];
+        let selectedSection = standardSections[0];
+        for (let i = 0; i < standardSections.length; i++) {
+          if (standardSections[i] >= section) {
+            selectedSection = standardSections[i];
+            break;
+          }
+        }
+        
+        // Проверка по допустимому току
+        let maxCurrent = 0;
+        if (material === 'copper') {
+          if (selectedSection <= 1.5) maxCurrent = 19;
+          else if (selectedSection <= 2.5) maxCurrent = 27;
+          else if (selectedSection <= 4) maxCurrent = 36;
+          else if (selectedSection <= 6) maxCurrent = 46;
+          else if (selectedSection <= 10) maxCurrent = 70;
+          else maxCurrent = 90;
+        } else {
+          if (selectedSection <= 2.5) maxCurrent = 20;
+          else if (selectedSection <= 4) maxCurrent = 28;
+          else if (selectedSection <= 6) maxCurrent = 36;
+          else if (selectedSection <= 10) maxCurrent = 50;
+          else maxCurrent = 80;
+        }
+        
+        // Проверка на соответствие
+        const isSuitable = current <= maxCurrent;
+        
+        resultText = `
+          <p><strong>Тип расчета:</strong> По току</p>
+          <p><strong>Ток:</strong> ${current} А</p>
+          <p><strong>Напряжение:</strong> ${voltage} В</p>
+          <p><strong>Длина линии:</strong> ${length} м</p>
+          <p><strong>Материал проводника:</strong> ${material === 'copper' ? 'Медь' : 'Алюминий'}</p>
+          <p><strong>Требуемое сечение:</strong> ${section.toFixed(2)} мм²</p>
+          <p><strong>Рекомендуемое сечение:</strong> ${selectedSection} мм²</p>
+          <p><strong>Допустимый ток для сечения:</strong> ${maxCurrent} А</p>
+          <p><strong>Требуемый ток:</strong> ${current} А</p>
+          <p><strong>Соответствует требованиям:</strong> ${isSuitable ? 'Да' : 'Нет'}</p>
+          <p><strong>Расчет выполнен по ПУЭ 7 изд.</strong></p>
+        `;
+      }
+      
+      // Показываем результаты
+      document.getElementById('cable-result-text').innerHTML = resultText;
+      document.getElementById('cable-result').style.display = 'block';
+    }
+    
+    // Функция расчета устройств защиты
+    function calculateProtection() {
+      const protectionType = document.getElementById('protection-type').value;
+      const voltage = parseInt(document.getElementById('protection-voltage').value);
+      const current = parseFloat(document.getElementById('protection-current').value);
+      const cableSection = parseFloat(document.getElementById('protection-cable-section').value);
+      const loadType = document.getElementById('protection-load-type').value;
+      
+      if (isNaN(current) || isNaN(cableSection)) {
+        alert('Пожалуйста, введите все значения для расчета защиты');
+        return;
+      }
+      
+      // Определение номинального тока автомата
+      let nominalCurrent = 0;
+      const standardCurrents = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100];
+      
+      // Для индуктивных нагрузок добавляем запас
+      const currentFactor = loadType === 'inductive' ? 1.25 : 1.0;
+      const adjustedCurrent = current * currentFactor;
+      
+      for (let i = 0; i < standardCurrents.length; i++) {
+        if (standardCurrents[i] >= adjustedCurrent) {
+          nominalCurrent = standardCurrents[i];
+          break;
+        }
+      }
+      
+      // Проверка соответствия сечению кабеля
+      let maxCurrentForSection = 0;
+      if (cableSection <= 1.5) maxCurrentForSection = 19;
+      else if (cableSection <= 2.5) maxCurrentForSection = 27;
+      else if (cableSection <= 4) maxCurrentForSection = 36;
+      else if (cableSection <= 6) maxCurrentForSection = 46;
+      else if (cableSection <= 10) maxCurrentForSection = 70;
+      else maxCurrentForSection = 90;
+      
+      const isSectionSuitable = nominalCurrent <= maxCurrentForSection;
+      
+      // Формирование результата
+      let resultText = '';
+      
+      if (protectionType === 'circuit-breaker') {
+        resultText = `
+          <p><strong>Тип защиты:</strong> Автоматический выключатель</p>
+          <p><strong>Напряжение сети:</strong> ${voltage} В</p>
+          <p><strong>Ток нагрузки:</strong> ${current} А</p>
+          <p><strong>Сечение кабеля:</strong> ${cableSection} мм²</p>
+          <p><strong>Тип нагрузки:</strong> ${loadType === 'resistive' ? 'Активная' : 
+            loadType === 'inductive' ? 'Индуктивная' : 'Смешанная'}</p>
+          <p><strong>Рекомендуемый номинал:</strong> ${nominalCurrent} А</p>
+          <p><strong>Макс. ток для сечения:</strong> ${maxCurrentForSection} А</p>
+          <p><strong>Соответствует требованиям:</strong> ${isSectionSuitable ? 'Да' : 'Нет'}</p>
+          <p><strong>Рекомендуемая модель:</strong> ${voltage === 220 ? 'ВА 47-29' : 'ВА 51-35'}</p>
+        `;
+      } else if (protectionType === 'rcc') {
+        const leakageCurrent = parseInt(document.getElementById('rcc-leakage-current').value);
+        
+        resultText = `
+          <p><strong>Тип защиты:</strong> УЗО</p>
+          <p><strong>Напряжение сети:</strong> ${voltage} В</p>
+          <p><strong>Ток нагрузки:</strong> ${current} А</p>
+          <p><strong>Сечение кабеля:</strong> ${cableSection} мм²</p>
+          <p><strong>Тип нагрузки:</strong> ${loadType === 'resistive' ? 'Активная' : 
+            loadType === 'inductive' ? 'Индуктивная' : 'Смешанная'}</p>
+          <p><strong>Ток утечки:</strong> ${leakageCurrent} мА</p>
+          <p><strong>Рекомендуемый номинал:</strong> ${nominalCurrent} А</p>
+          <p><strong>Макс. ток для сечения:</strong> ${maxCurrentForSection} А</p>
+          <p><strong>Соответствует требованиям:</strong> ${isSectionSuitable ? 'Да' : 'Нет'}</p>
+          <p><strong>Рекомендуемая модель:</strong> ${voltage === 220 ? 'ВД1-63' : 'ВД2-63'}</p>
+        `;
+      } else {
+        const leakageCurrent = 30; // Для дифавтоматов обычно 30 мА
+        
+        resultText = `
+          <p><strong>Тип защиты:</strong> Дифавтомат</p>
+          <p><strong>Напряжение сети:</strong> ${voltage} В</p>
+          <p><strong>Ток нагрузки:</strong> ${current} А</p>
+          <p><strong>Сечение кабеля:</strong> ${cableSection} мм²</p>
+          <p><strong>Тип нагрузки:</strong> ${loadType === 'resistive' ? 'Активная' : 
+            loadType === 'inductive' ? 'Индуктивная' : 'Смешанная'}</p>
+          <p><strong>Ток утечки:</strong> ${leakageCurrent} мА</p>
+          <p><strong>Рекомендуемый номинал:</strong> ${nominalCurrent} А</p>
+          <p><strong>Макс. ток для сечения:</strong> ${maxCurrentForSection} А</p>
+          <p><strong>Соответствует требованиям:</strong> ${isSectionSuitable ? 'Да' : 'Нет'}</p>
+          <p><strong>Рекомендуемая модель:</strong> ${voltage === 220 ? 'АВДТ32' : 'АВДТ50'}</p>
+        `;
+      }
+      
+      resultText += `<p><strong>Расчет выполнен по ПУЭ 7 изд.</strong></p>`;
+      
+      // Показываем результаты
+      document.getElementById('protection-result-text').innerHTML = resultText;
+      document.getElementById('protection-result').style.display = 'block';
+    }
+    
+    // Функция расчета активной и реактивной мощности
+    function calculatePower() {
+      const calculationType = document.getElementById('power-calculation-type').value;
+      
+      let resultText = '';
+      
+      if (calculationType === 'to-power') {
+        const voltage = parseFloat(document.getElementById('power-voltage').value);
+        const current = parseFloat(document.getElementById('power-current').value);
+        const powerFactor = parseFloat(document.getElementById('power-factor-calc').value);
+        
+        if (isNaN(voltage) || isNaN(current) || isNaN(powerFactor)) {
+          alert('Пожалуйста, введите все значения для расчета мощности');
+          return;
+        }
+        
+        // Расчет мощностей
+        const apparentPower = voltage * current; // ВА
+        const activePower = apparentPower * powerFactor; // Вт
+        const reactivePower = Math.sqrt(Math.pow(apparentPower, 2) - Math.pow(activePower, 2)); // ВАр
+        const angle = Math.acos(powerFactor) * 180 / Math.PI; // Угол в градусах
+        
+        resultText = `
+          <p><strong>Тип расчета:</strong> По напряжению и току</p>
+          <p><strong>Напряжение:</strong> ${voltage} В</p>
+          <p><strong>Ток:</strong> ${current} А</p>
+          <p><strong>Коэффициент мощности (cos φ):</strong> ${powerFactor}</p>
+          <p><strong>Полная мощность (S):</strong> ${apparentPower.toFixed(2)} ВА</p>
+          <p><strong>Активная мощность (P):</strong> ${activePower.toFixed(2)} Вт</p>
+          <p><strong>Реактивная мощность (Q):</strong> ${reactivePower.toFixed(2)} ВАр</p>
+          <p><strong>Угол сдвига фаз (φ):</strong> ${angle.toFixed(2)}°</p>
+          <p><strong>Расчет выполнен по СП 25.13330.2016</strong></p>
+        `;
+      } else {
+        const totalPower = parseFloat(document.getElementById('power-total').value);
+        const powerFactor = parseFloat(document.getElementById('power-factor-power').value);
+        
+        if (isNaN(totalPower) || isNaN(powerFactor)) {
+          alert('Пожалуйста, введите все значения для расчета мощности');
+          return;
+        }
+        
+        // Расчет мощностей
+        const activePower = totalPower * powerFactor; // Вт
+        const reactivePower = totalPower * Math.sqrt(1 - Math.pow(powerFactor, 2)); // ВАр
+        const angle = Math.acos(powerFactor) * 180 / Math.PI; // Угол в градусах
+        
+        resultText = `
+          <p><strong>Тип расчета:</strong> По полной мощности</p>
+          <p><strong>Полная мощность (S):</strong> ${totalPower} ВА</p>
+          <p><strong>Коэффициент мощности (cos φ):</strong> ${powerFactor}</p>
+          <p><strong>Активная мощность (P):</strong> ${activePower.toFixed(2)} Вт</p>
+          <p><strong>Реактивная мощность (Q):</strong> ${reactivePower.toFixed(2)} ВАр</p>
+          <p><strong>Угол сдвига фаз (φ):</strong> ${angle.toFixed(2)}°</p>
+          <p><strong>Расчет выполнен по СП 25.13330.2016</strong></p>
+        `;
+      }
+      
+      // Показываем результаты
+      document.getElementById('power-result-text').innerHTML = resultText;
+      document.getElementById('power-result').style.display = 'block';
+    }
+    
+    // Функция подбора электродвигателя
+    function calculateMotor() {
+      const power = parseFloat(document.getElementById('motor-power').value);
+      const voltage = document.getElementById('motor-voltage').value;
+      const motorType = document.getElementById('motor-type').value;
+      const loadType = document.getElementById('motor-load-type').value;
+      const speed = document.getElementById('motor-speed').value;
+      
+      if (isNaN(power)) {
+        alert('Пожалуйста, введите мощность двигателя');
+        return;
+      }
+      
+      // Расчет тока
+      let current = 0;
+      if (voltage === '220') {
+        // Для однофазного двигателя
+        current = power * 1000 / 220;
+      } else {
+        // Для трехфазного двигателя
+        current = power * 1000 / (Math.sqrt(3) * 380 * 0.85);
+      }
+      
+      // Подбор модели двигателя
+      let motorModel = '';
+      if (motorType === 'asynchronous') {
+        if (power <= 1.1) {
+          motorModel = voltage === '220' ? 'АИРЕ 56B2' : 'АИРЕ 56B2';
+        } else if (power <= 2.2) {
+          motorModel = voltage === '220' ? 'АИРЕ 63A2' : 'АИРЕ 63A2';
+        } else if (power <= 3) {
+          motorModel = voltage === '220' ? 'АИРЕ 63B2' : 'АИРЕ 63B2';
+        } else if (power <= 4) {
+          motorModel = voltage === '220' ? 'АИРЕ 71A2' : 'АИРЕ 71A2';
+        } else {
+          motorModel = voltage === '220' ? 'АИРЕ 71B2' : 'АИРЕ 71B2';
+        }
+      } else if (motorType === 'synchronous') {
+        motorModel = 'СДК 112М';
+      } else {
+        motorModel = 'ДПМ 51';
+      }
+      
+      // Расчет пускового тока
+      const startingCurrent = current * (loadType === 'high-start' ? 7 : 5);
+      
+      resultText = `
+        <p><strong>Требуемая мощность:</strong> ${power} кВт</p>
+        <p><strong>Напряжение сети:</strong> ${voltage === '220' ? '220 В' : '380 В'}</p>
+        <p><strong>Тип двигателя:</strong> ${motorType === 'asynchronous' ? 'Асинхронный' : 
+          motorType === 'synchronous' ? 'Синхронный' : 'Постоянного тока'}</p>
+        <p><strong>Тип нагрузки:</strong> ${loadType === 'constant' ? 'Постоянная' : 
+          loadType === 'variable' ? 'Переменная' : 'Высокий пусковой момент'}</p>
+        <p><strong>Частота вращения:</strong> ${speed} об/мин</p>
+        <p><strong>Рабочий ток:</strong> ${current.toFixed(2)} А</p>
+        <p><strong>Пусковой ток:</strong> ${startingCurrent.toFixed(2)} А</p>
+        <p><strong>Рекомендуемая модель:</strong> ${motorModel}</p>
+        <p><strong>КПД:</strong> ${power <= 2.2 ? '75-80%' : '80-85%'}</p>
+        <p><strong>Коэффициент мощности:</strong> 0.80-0.85</p>
+        <p><strong>Расчет выполнен по ГОСТ Р МЭК 60034-1-2014</strong></p>
+      `;
+      
+      // Показываем результаты
+      document.getElementById('motor-result-text').innerHTML = resultText;
+      document.getElementById('motor-result').style.display = 'block';
+    }
+    
+    // Функция расчета конденсатора для двигателя
+    function calculateCapacitor() {
+      const power = parseFloat(document.getElementById('capacitor-power').value);
+      const voltage = parseFloat(document.getElementById('capacitor-voltage').value);
+      const current = parseFloat(document.getElementById('capacitor-current').value);
+      const frequency = parseInt(document.getElementById('capacitor-frequency').value);
+      const capacitorType = document.getElementById('capacitor-type').value;
+      
+      if (isNaN(power) || isNaN(voltage) || isNaN(current)) {
+        alert('Пожалуйста, введите все значения для расчета конденсатора');
+        return;
+      }
+      
+      // Расчет рабочей емкости
+      const workingCapacity = (2800 * current) / voltage;
+      
+      // Расчет пусковой емкости (обычно в 2-3 раза больше рабочей)
+      const startingCapacity = workingCapacity * 2.5;
+      
+      // Расчет рабочего напряжения конденсатора
+      const capacitorVoltage = voltage * 1.15;
+      
+      resultText = `
+        <p><strong>Мощность двигателя:</strong> ${power} кВт</p>
+        <p><strong>Номинальное напряжение:</strong> ${voltage} В</p>
+        <p><strong>Номинальный ток:</strong> ${current} А</p>
+        <p><strong>Частота сети:</strong> ${frequency} Гц</p>
+      `;
+      
+      if (capacitorType === 'running') {
+        resultText += `
+          <p><strong>Тип конденсатора:</strong> Рабочий</p>
+          <p><strong>Рабочая емкость:</strong> ${workingCapacity.toFixed(2)} мкФ</p>
+          <p><strong>Рабочее напряжение:</strong> ${Math.ceil(capacitorVoltage)} В</p>
+          <p><strong>Рекомендуемый тип конденсатора:</strong> МБГО, МБГП, К75-12</p>
+        `;
+      } else if (capacitorType === 'starting') {
+        resultText += `
+          <p><strong>Тип конденсатора:</strong> Пусковой</p>
+          <p><strong>Пусковая емкость:</strong> ${startingCapacity.toFixed(2)} мкФ</p>
+          <p><strong>Рабочее напряжение:</strong> ${Math.ceil(capacitorVoltage)} В</p>
+          <p><strong>Рекомендуемый тип конденсатора:</strong> ЭП, К78-17</p>
+        `;
+      } else {
+        resultText += `
+          <p><strong>Тип конденсатора:</strong> Рабочий и пусковой</p>
+          <p><strong>Рабочая емкость:</strong> ${workingCapacity.toFixed(2)} мкФ</p>
+          <p><strong>Пусковая емкость:</strong> ${startingCapacity.toFixed(2)} мкФ</p>
+          <p><strong>Рабочее напряжение:</strong> ${Math.ceil(capacitorVoltage)} В</p>
+          <p><strong>Рекомендуемые типы:</strong></p>
+          <p>- Рабочий: МБГО, МБГП, К75-12</p>
+          <p>- Пусковой: ЭП, К78-17</p>
+        `;
+      }
+      
+      resultText += `<p><strong>Расчет выполнен по ГОСТ Р МЭК 60252-1-2008</strong></p>`;
+      
+      // Показываем результаты
+      document.getElementById('capacitor-result-text').innerHTML = resultText;
+      document.getElementById('capacitor-result').style.display = 'block';
+    }
+    
+    // Функция расчета заземления
+    function calculateGrounding() {
+      const groundingType = document.getElementById('grounding-type').value;
+      const voltage = document.getElementById('grounding-voltage').value;
+      const soilType = document.getElementById('grounding-soil').value;
+      const climateZone = document.getElementById('grounding-climate').value;
+      const maxResistance = parseFloat(document.getElementById('grounding-resistance').value);
+      
+      if (isNaN(maxResistance)) {
+        alert('Пожалуйста, введите допустимое сопротивление');
+        return;
+      }
+      
+      // Удельное сопротивление грунта
+      let soilResistivity = 0;
+      switch (soilType) {
+        case 'clay':
+          soilResistivity = 40;
+          break;
+        case 'silt':
+          soilResistivity = 100;
+          break;
+        case 'sand':
+          soilResistivity = 500;
+          break;
+        case 'rock':
+          soilResistivity = 1000;
+          break;
+      }
+      
+      // Коэффициент сезонности
+      let climateFactor = 1.0;
+      switch (climateZone) {
+        case '1':
+          climateFactor = 1.3;
+          break;
+        case '2':
+          climateFactor = 1.5;
+          break;
+        case '3':
+          climateFactor = 1.8;
+          break;
+        case '4':
+          climateFactor = 2.0;
+          break;
+      }
+      
+      // Расчетное сопротивление грунта
+      const calculatedSoilResistivity = soilResistivity * climateFactor;
+      
+      // Длина вертикального электрода
+      const electrodeLength = 2.5; // м
+      
+      // Сопротивление одиночного вертикального электрода
+      const singleElectrodeResistance = (calculatedSoilResistivity / (2 * Math.PI * electrodeLength)) * 
+        Math.log((4 * electrodeLength) / 0.05);
+      
+      // Необходимое количество электродов
+      const numElectrodes = Math.ceil(singleElectrodeResistance / maxResistance);
+      
+      // Длина горизонтального соединителя
+      const horizontalLength = numElectrodes * 3; // расстояние между электродами 3 м
+      
+      // Сопротивление горизонтального соединителя
+      const horizontalResistance = (calculatedSoilResistivity / (2 * Math.PI * horizontalLength)) * 
+        Math.log((horizontalLength * horizontalLength) / (0.5 * 0.05 * electrodeLength));
+      
+      // Общее сопротивление заземляющего устройства
+      const totalResistance = (singleElectrodeResistance * horizontalResistance) / 
+        (numElectrodes * horizontalResistance + 0.5 * singleElectrodeResistance);
+      
+      // Проверка на соответствие
+      const isResistanceAcceptable = totalResistance <= maxResistance;
+      
+      resultText = `
+        <p><strong>Тип электроустановки:</strong> ${groundingType === 'residential' ? 'Жилые здания' : 
+          groundingType === 'industrial' ? 'Промышленные установки' : 'Трансформаторные подстанции'}</p>
+        <p><strong>Напряжение сети:</strong> ${voltage === '220' ? '220 В' : 
+          voltage === '380' ? '380 В' : 
+          voltage === '6000' ? '6 кВ' : '10 кВ'}</p>
+        <p><strong>Тип грунта:</strong> ${soilType === 'clay' ? 'Глина' : 
+          soilType === 'silt' ? 'Суглинок' : 
+          soilType === 'sand' ? 'Песок' : 'Скальный грунт'}</p>
+        <p><strong>Климатическая зона:</strong> ${climateZone === '1' ? 'I зона' : 
+          climateZone === '2' ? 'II зона' : 
+          climateZone === '3' ? 'III зона' : 'IV зона'}</p>
+        <p><strong>Удельное сопротивление грунта:</strong> ${soilResistivity} Ом·м</p>
+        <p><strong>Коэффициент сезонности:</strong> ${climateFactor}</p>
+        <p><strong>Расчетное сопротивление грунта:</strong> ${calculatedSoilResistivity.toFixed(2)} Ом·м</p>
+        <p><strong>Сопротивление одиночного электрода:</strong> ${singleElectrodeResistance.toFixed(2)} Ом</p>
+        <p><strong>Необходимое количество электродов:</strong> ${numElectrodes}</p>
+        <p><strong>Общее сопротивление заземления:</strong> ${totalResistance.toFixed(2)} Ом</p>
+        <p><strong>Допустимое сопротивление:</strong> ${maxResistance} Ом</p>
+        <p><strong>Соответствует требованиям:</strong> ${isResistanceAcceptable ? 'Да' : 'Нет'}</p>
+        <p><strong>Расчет выполнен по ПУЭ 7 изд.</strong></p>
+      `;
+      
+      // Показываем результаты
+      document.getElementById('grounding-result-text').innerHTML = resultText;
+      document.getElementById('grounding-result').style.display = 'block';
+    }
+    
+    // Функция для инициализации приложения
+    function initApp() {
+      createStars();
+      
+      // Инициализация значений
+      document.getElementById('grounding-climate').addEventListener('change', function() {
+        const climateZone = this.value;
+        let resistance = 4;
+        
+        if (groundingType === 'residential') {
+          if (voltage === '220' || voltage === '380') {
+            resistance = 4;
+          }
+        } else if (groundingType === 'industrial') {
+          if (voltage === '6000') {
+            resistance = 4;
+          } else if (voltage === '10000') {
+            resistance = 2;
+          }
+        } else {
+          if (voltage === '6000') {
+            resistance = 4;
+          } else if (voltage === '10000') {
+            resistance = 2;
+          }
+        }
+        
+        document.getElementById('grounding-resistance').value = resistance;
+      });
+      
+      document.getElementById('grounding-type').addEventListener('change', function() {
+        const groundingType = this.value;
+        const voltage = document.getElementById('grounding-voltage').value;
+        let resistance = 4;
+        
+        if (groundingType === 'residential') {
+          if (voltage === '220' || voltage === '380') {
+            resistance = 4;
+          }
+        } else if (groundingType === 'industrial') {
+          if (voltage === '6000') {
+            resistance = 4;
+          } else if (voltage === '10000') {
+            resistance = 2;
+          }
+        } else {
+          if (voltage === '6000') {
+            resistance = 4;
+          } else if (voltage === '10000') {
+            resistance = 2;
+          }
+        }
+        
+        document.getElementById('grounding-resistance').value = resistance;
+      });
+      
+      document.getElementById('grounding-voltage').addEventListener('change', function() {
+        const groundingType = document.getElementById('grounding-type').value;
+        const voltage = this.value;
+        let resistance = 4;
+        
+        if (groundingType === 'residential') {
+          if (voltage === '220' || voltage === '380') {
+            resistance = 4;
+          }
+        } else if (groundingType === 'industrial') {
+          if (voltage === '6000') {
+            resistance = 4;
+          } else if (voltage === '10000') {
+            resistance = 2;
+          }
+        } else {
+          if (voltage === '6000') {
+            resistance = 4;
+          } else if (voltage === '10000') {
+            resistance = 2;
+          }
+        }
+        
+        document.getElementById('grounding-resistance').value = resistance;
+      });
+      
+      // Показываем главное меню по умолчанию
+      showSection('main-menu');
+      
+      // Плавная прокрутка
+      document.querySelectorAll('.submenu, .calculator-container').forEach(container => {
+        container.addEventListener('touchstart', function(e) {
+          this.startY = e.touches[0].clientY;
+        });
+        
+        container.addEventListener('touchmove', function(e) {
+          if (!this.startY) return;
+          
+          const deltaY = e.touches[0].clientY - this.startY;
+          this.scrollTop -= deltaY;
+          this.startY = e.touches[0].clientY;
+          e.preventDefault();
+        });
+      });
+    }
+    
+    // Инициализация при загрузке страницы
+    window.onload = initApp;
+  </script>
+</body>
+</html>

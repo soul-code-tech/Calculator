@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Площади - Геометрические расчеты</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #e0e0e0;
+      text-align: center;
+      min-height: 100vh;
+      padding: 15px;
+      position: relative;
+      overflow: hidden;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Эффект мерцающих звезд в фоне */
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .star {
+      position: absolute;
+      background: #ffffff;
+      border-radius: 50%;
+      animation: twinkle 3s infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.8; }
+    }
+
+    .page {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .container {
+      max-width: 100%;
+      margin: 15px auto;
+      padding: 20px 15px;
+      background: rgba(15, 25, 35, 0.85);
+      border: 2px solid #4CAF50;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
+      position: relative;
+      overflow: hidden;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+    }
+
+    .container::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: #4CAF50;
+      font-size: 1.8em;
+      text-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+      margin-bottom: 15px;
+      position: relative;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    h1::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+      margin: 10px auto;
+    }
+
+    .subtitle {
+      font-size: 1.1em;
+      color: #b0bec5;
+      margin-bottom: 20px;
+      font-weight: 300;
+      line-height: 1.4;
+    }
+
+    .submenu {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin: 20px 0;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #4CAF50 rgba(30, 40, 50, 0.7);
+    }
+
+    .submenu::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .submenu::-webkit-scrollbar-track {
+      background: rgba(30, 40, 50, 0.5);
+      border-radius: 4px;
+    }
+
+    .submenu::-webkit-scrollbar-thumb {
+      background: #4CAF50;
+      border-radius: 4px;
+    }
+
+    .submenu::-webkit-scrollbar-thumb:hover {
+      background: #8BC34A;
+    }
+
+    .submenu-item {
+      background: rgba(30, 40, 50, 0.7);
+      border: 1px solid #4CAF50;
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .submenu-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+      background: rgba(40, 50, 60, 0.8);
+    }
+
+    .submenu-item::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px;
+      height: 100%;
+      background: #4CAF50;
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+    }
+
+    .submenu-item:hover::before {
+      transform: scaleY(1);
+    }
+
+    .submenu-icon {
+      font-size: 2.2em;
+      width: 50px;
+      text-align: center;
+      color: #4CAF50;
+      transition: all 0.3s ease;
+    }
+
+    .submenu-item:hover .submenu-icon {
+      transform: scale(1.2);
+    }
+
+    .submenu-title {
+      font-family: 'Orbitron', sans-serif;
+      color: #4CAF50;
+      font-size: 1.3em;
+      margin-bottom: 8px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .submenu-description {
+      color: #b0bec5;
+      font-size: 1em;
+      line-height: 1.4;
+      font-weight: 300;
+    }
+
+    .calculator-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px 0;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #4CAF50 rgba(30, 40, 50, 0.7);
+    }
+
+    .calculator-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .calculator-container::-webkit-scrollbar-track {
+      background: rgba(30, 40, 50, 0.5);
+      border-radius: 4px;
+    }
+
+    .calculator-container::-webkit-scrollbar-thumb {
+      background: #4CAF50;
+      border-radius: 4px;
+    }
+
+    .calculator-container::-webkit-scrollbar-thumb:hover {
+      background: #8BC34A;
+    }
+
+    .input-group {
+      width: 100%;
+      max-width: 300px;
+      margin: 15px 0;
+    }
+
+    .input-label {
+      display: block;
+      text-align: left;
+      margin-bottom: 6px;
+      color: #4CAF50;
+      font-weight: 500;
+      font-size: 1.05em;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      background: rgba(30, 40, 50, 0.7);
+      border: 1px solid #4CAF50;
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-family: 'Roboto', sans-serif;
+      font-size: 1.1em;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #8BC34A;
+      box-shadow: 0 0 8px rgba(139, 195, 74, 0.3);
+    }
+
+    .btn-calculator {
+      background: #4CAF50;
+      color: #0d2a17;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-family: 'Roboto', sans-serif;
+      font-size: 1.1em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 15px 0;
+      width: 100%;
+      max-width: 300px;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    }
+
+    .btn-calculator:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 15px rgba(76, 175, 80, 0.7);
+    }
+
+    .result-container {
+      background: rgba(30, 40, 50, 0.7);
+      border: 1px solid #4CAF50;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 20px 0;
+      width: 100%;
+      max-width: 300px;
+      text-align: left;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+      display: none;
+    }
+
+    .result-title {
+      font-family: 'Orbitron', sans-serif;
+      color: #4CAF50;
+      font-size: 1.4em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .result-text {
+      color: #e0e0e0;
+      line-height: 1.5;
+      font-size: 1.05em;
+    }
+
+    .info-box {
+      background: rgba(30, 40, 50, 0.5);
+      border: 1px solid #4CAF50;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 15px 0;
+      text-align: left;
+      font-size: 0.95em;
+      line-height: 1.4;
+    }
+
+    .info-title {
+      color: #4CAF50;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .nav-buttons {
+      margin: 20px auto 10px;
+      display: flex;
+      justify-content: space-between;
+      max-width: 100%;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn-back, .btn-home {
+      display: inline-block;
+      padding: 12px 20px;
+      background: rgba(76, 175, 80, 0.25);
+      color: #4CAF50;
+      text-decoration: none;
+      border: 1px solid #4CAF50;
+      border-radius: 10px;
+      font-size: 1.1em;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+      min-width: 120px;
+      flex: 1;
+    }
+
+    .btn-back:hover, .btn-home:hover {
+      background: rgba(76, 175, 80, 0.4);
+      transform: scale(1.03);
+      box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Адаптация для мобильных устройств */
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px 10px;
+        border-radius: 16px;
+      }
+      
+      .input-field {
+        font-size: 1.05em;
+      }
+      
+      .btn-calculator {
+        font-size: 1.05em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  
+  <div class="container">
+    <!-- Главное меню площадей -->
+    <div id="main-menu" class="page">
+      <h1>📐 Площади</h1>
+      <p class="subtitle">Геометрические расчеты для строительства</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация:</div>
+        <p>Все расчеты выполняются по математическим формулам</p>
+        <p>Используется для определения площадей поверхностей в строительстве</p>
+      </div>
+      
+      <div class="submenu">
+        <div class="submenu-item" onclick="showSection('wall-area')">
+          <div class="submenu-icon">🧱</div>
+          <div>
+            <div class="submenu-title">Площадь стен</div>
+            <div class="submenu-description">Расчет площади стен помещения</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('ceiling-floor-area')">
+          <div class="submenu-icon">🏠</div>
+          <div>
+            <div class="submenu-title">Площадь потолка и пола</div>
+            <div class="submenu-description">Расчет площади прямоугольных, квадратных и сложных поверхностей</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('beam-area')">
+          <div class="submenu-icon">📏</div>
+          <div>
+            <div class="submenu-title">Площадь покрытия балки</div>
+            <div class="submenu-description">Расчет площади поверхности двутавровой балки</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('tube-area')">
+          <div class="submenu-icon">🔩</div>
+          <div>
+            <div class="submenu-title">Площадь покрытия трубы</div>
+            <div class="submenu-description">Расчет площади поверхности трубы для покраски или изоляции</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('cone-area')">
+          <div class="submenu-icon">🔺</div>
+          <div>
+            <div class="submenu-title">Площадь конуса</div>
+            <div class="submenu-description">Расчет площади поверхности конуса</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('trapezoid-area')">
+          <div class="submenu-icon">🔷</div>
+          <div>
+            <div class="submenu-title">Площадь трапеции</div>
+            <div class="submenu-description">Расчет площади трапециевидных поверхностей</div>
+          </div>
+        </div>
+        
+        <div class="submenu-item" onclick="showSection('tetrahedron-area')">
+          <div class="submenu-icon">🔷</div>
+          <div>
+            <div class="submenu-title">Площадь тетраэдра</div>
+            <div class="submenu-description">Расчет площади поверхности правильного тетраэдра</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="index.html" class="btn-back">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Расчет площади стен -->
+    <div id="wall-area" class="page hidden">
+      <h1>🧱 Площадь стен</h1>
+      <p class="subtitle">Расчет площади стен помещения</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Площадь стен рассчитывается как сумма площадей всех стен минус площадь окон и дверей</p>
+        <p>Используется для определения количества материалов (штукатурка, краска, обои)</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Длина помещения (м):</label>
+          <input type="number" class="input-field" id="wall-length" placeholder="Введите длину" value="5">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Ширина помещения (м):</label>
+          <input type="number" class="input-field" id="wall-width" placeholder="Введите ширину" value="4">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Высота помещения (м):</label>
+          <input type="number" class="input-field" id="wall-height" placeholder="Введите высоту" value="2.7">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Количество окон:</label>
+          <input type="number" class="input-field" id="wall-windows" placeholder="Введите количество" value="2">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Размер окон (м):</label>
+          <input type="text" class="input-field" id="wall-window-size" placeholder="Ширина x Высота" value="1.5x1.5">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Количество дверей:</label>
+          <input type="number" class="input-field" id="wall-doors" placeholder="Введите количество" value="1">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Размер дверей (м):</label>
+          <input type="text" class="input-field" id="wall-door-size" placeholder="Ширина x Высота" value="0.9x2.1">
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateWallArea()">
+          Рассчитать площадь
+        </button>
+        
+        <div class="result-container" id="wall-area-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="wall-area-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Расчет площади потолка и пола -->
+    <div id="ceiling-floor-area" class="page hidden">
+      <h1>🏠 Площадь потолка и пола</h1>
+      <p class="subtitle">Расчет площади прямоугольных, квадратных и сложных поверхностей</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Площадь пола и потолка обычно одинакова и рассчитывается как площадь основания помещения</p>
+        <p>Для сложных форм поверхность разбивается на простые геометрические фигуры</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Тип поверхности:</label>
+          <select class="input-field" id="surface-type" onchange="toggleSurfaceFields()">
+            <option value="rectangle">Прямоугольная</option>
+            <option value="square">Квадратная</option>
+            <option value="complex">Сложная форма</option>
+          </select>
+        </div>
+        
+        <div id="rectangle-fields">
+          <div class="input-group">
+            <label class="input-label">Длина помещения (м):</label>
+            <input type="number" class="input-field" id="floor-length" placeholder="Введите длину" value="5">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Ширина помещения (м):</label>
+            <input type="number" class="input-field" id="floor-width" placeholder="Введите ширину" value="4">
+          </div>
+        </div>
+        
+        <div id="square-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Сторона помещения (м):</label>
+            <input type="number" class="input-field" id="floor-side" placeholder="Введите сторону" value="5">
+          </div>
+        </div>
+        
+        <div id="complex-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Количество прямоугольников:</label>
+            <input type="number" class="input-field" id="floor-rectangles" placeholder="Введите количество" value="2">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Количество треугольников:</label>
+            <input type="number" class="input-field" id="floor-triangles" placeholder="Введите количество" value="1">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Количество трапеций:</label>
+            <input type="number" class="input-field" id="floor-trapezoids" placeholder="Введите количество" value="0">
+          </div>
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateCeilingFloorArea()">
+          Рассчитать площадь
+        </button>
+        
+        <div class="result-container" id="ceiling-floor-area-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="ceiling-floor-area-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Расчет площади покрытия балки -->
+    <div id="beam-area" class="page hidden">
+      <h1>📏 Площадь покрытия балки</h1>
+      <p class="subtitle">Расчет площади поверхности двутавровой балки</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Площадь покрытия балки рассчитывается как сумма площадей всех поверхностей</p>
+        <p>Используется для определения количества материалов (краска, грунтовка, изоляция)</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Тип балки:</label>
+          <select class="input-field" id="beam-type">
+            <option value="standard">Стандартная</option>
+            <option value="custom">Пользовательская</option>
+          </select>
+        </div>
+        
+        <div id="standard-beam-fields">
+          <div class="input-group">
+            <label class="input-label">Марка балки:</label>
+            <select class="input-field" id="beam-mark">
+              <option value="10">10</option>
+              <option value="12">12</option>
+              <option value="14">14</option>
+              <option value="16">16</option>
+              <option value="18">18</option>
+              <option value="20">20</option>
+              <option value="22">22</option>
+              <option value="24">24</option>
+              <option value="27">27</option>
+              <option value="30">30</option>
+            </select>
+          </div>
+        </div>
+        
+        <div id="custom-beam-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Высота балки (мм):</label>
+            <input type="number" class="input-field" id="beam-height" placeholder="Введите высоту" value="200">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Ширина полки (мм):</label>
+            <input type="number" class="input-field" id="beam-flange-width" placeholder="Введите ширину" value="100">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Толщина полки (мм):</label>
+            <input type="number" class="input-field" id="beam-flange-thickness" placeholder="Введите толщину" value="10">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">Толщина стенки (мм):</label>
+            <input type="number" class="input-field" id="beam-web-thickness" placeholder="Введите толщину" value="8">
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Длина балки (м):</label>
+          <input type="number" class="input-field" id="beam-length" placeholder="Введите длину" value="6">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Количество балок:</label>
+          <input type="number" class="input-field" id="beam-quantity" placeholder="Введите количество" value="10">
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateBeamArea()">
+          Рассчитать площадь
+        </button>
+        
+        <div class="result-container" id="beam-area-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="beam-area-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Расчет площади покрытия трубы -->
+    <div id="tube-area" class="page hidden">
+      <h1>🔩 Площадь покрытия трубы</h1>
+      <p class="subtitle">Расчет площади поверхности трубы для покраски или изоляции</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Площадь поверхности трубы рассчитывается как площадь боковой поверхности цилиндра</p>
+        <p>Используется для определения количества материалов (краска, изоляция)</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Тип трубы:</label>
+          <select class="input-field" id="tube-type">
+            <option value="standard">Стандартная</option>
+            <option value="custom">Пользовательская</option>
+          </select>
+        </div>
+        
+        <div id="standard-tube-fields">
+          <div class="input-group">
+            <label class="input-label">Наружный диаметр:</label>
+            <select class="input-field" id="tube-diameter">
+              <option value="15">15 мм</option>
+              <option value="20">20 мм</option>
+              <option value="25">25 мм</option>
+              <option value="32">32 мм</option>
+              <option value="40">40 мм</option>
+              <option value="50">50 мм</option>
+              <option value="60">60 мм</option>
+              <option value="76">76 мм</option>
+              <option value="89">89 мм</option>
+              <option value="102">102 мм</option>
+              <option value="108">108 мм</option>
+              <option value="114">114 мм</option>
+              <option value="127">127 мм</option>
+              <option value="133">133 мм</option>
+              <option value="159">159 мм</option>
+              <option value="168">168 мм</option>
+              <option value="219">219 мм</option>
+            </select>
+          </div>
+        </div>
+        
+        <div id="custom-tube-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Наружный диаметр (мм):</label>
+            <input type="number" class="input-field" id="tube-custom-diameter" placeholder="Введите диаметр" value="100">
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Длина трубы (м):</label>
+          <input type="number" class="input-field" id="tube-length" placeholder="Введите длину" value="6">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Количество труб:</label>
+          <input type="number" class="input-field" id="tube-quantity" placeholder="Введите количество" value="5">
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateTubeArea()">
+          Рассчитать площадь
+        </button>
+        
+        <div class="result-container" id="tube-area-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="tube-area-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Расчет площади конуса -->
+    <div id="cone-area" class="page hidden">
+      <h1>🔺 Площадь конуса</h1>
+      <p class="subtitle">Расчет площади поверхности конуса</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Площадь конуса рассчитывается как сумма площади основания и боковой поверхности</p>
+        <p>Используется в строительстве и архитектуре для конических элементов</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Тип расчета:</label>
+          <select class="input-field" id="cone-calculation-type" onchange="toggleConeFields()">
+            <option value="radius">По радиусу основания</option>
+            <option value="diameter">По диаметру основания</option>
+          </select>
+        </div>
+        
+        <div id="cone-radius-fields">
+          <div class="input-group">
+            <label class="input-label">Радиус основания (м):</label>
+            <input type="number" class="input-field" id="cone-radius" placeholder="Введите радиус" value="1">
+          </div>
+        </div>
+        
+        <div id="cone-diameter-fields" class="hidden">
+          <div class="input-group">
+            <label class="input-label">Диаметр основания (м):</label>
+            <input type="number" class="input-field" id="cone-diameter" placeholder="Введите диаметр" value="2">
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Высота конуса (м):</label>
+          <input type="number" class="input-field" id="cone-height" placeholder="Введите высоту" value="3">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Количество конусов:</label>
+          <input type="number" class="input-field" id="cone-quantity" placeholder="Введите количество" value="1">
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateConeArea()">
+          Рассчитать площадь
+        </button>
+        
+        <div class="result-container" id="cone-area-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="cone-area-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Расчет площади трапеции -->
+    <div id="trapezoid-area" class="page hidden">
+      <h1>🔷 Площадь трапеции</h1>
+      <p class="subtitle">Расчет площади трапециевидных поверхностей</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Площадь трапеции рассчитывается как полусумма оснований умноженная на высоту</p>
+        <p>Используется в строительстве для расчета скатов кровли и других элементов</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Длина верхнего основания (м):</label>
+          <input type="number" class="input-field" id="trapezoid-top" placeholder="Введите длину" value="3">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Длина нижнего основания (м):</label>
+          <input type="number" class="input-field" id="trapezoid-bottom" placeholder="Введите длину" value="5">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Высота трапеции (м):</label>
+          <input type="number" class="input-field" id="trapezoid-height" placeholder="Введите высоту" value="2">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Количество трапеций:</label>
+          <input type="number" class="input-field" id="trapezoid-quantity" placeholder="Введите количество" value="2">
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateTrapezoidArea()">
+          Рассчитать площадь
+        </button>
+        
+        <div class="result-container" id="trapezoid-area-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="trapezoid-area-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+
+    <!-- Расчет площади тетраэдра -->
+    <div id="tetrahedron-area" class="page hidden">
+      <h1>🔷 Площадь тетраэдра</h1>
+      <p class="subtitle">Расчет площади поверхности правильного тетраэдра</p>
+      
+      <div class="info-box">
+        <div class="info-title">Информация по расчету:</div>
+        <p>Площадь тетраэдра рассчитывается как сумма площадей четырех равносторонних треугольников</p>
+        <p>Используется в архитектуре и дизайне для расчета геометрических форм</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="input-group">
+          <label class="input-label">Длина ребра (м):</label>
+          <input type="number" class="input-field" id="tetrahedron-edge" placeholder="Введите длину" value="2">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">Количество тетраэдров:</label>
+          <input type="number" class="input-field" id="tetrahedron-quantity" placeholder="Введите количество" value="1">
+        </div>
+        
+        <button class="btn-calculator" onclick="calculateTetrahedronArea()">
+          Рассчитать площадь
+        </button>
+        
+        <div class="result-container" id="tetrahedron-area-result">
+          <div class="result-title">Результаты расчета</div>
+          <div class="result-text" id="tetrahedron-area-result-text"></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <a href="#" class="btn-back" onclick="showSection('main-menu')">⬅️ Назад</a>
+        <a href="index.html" class="btn-home">🏠 Главное меню</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Создаем мерцающие звезды
+    function createStars() {
+      const starsContainer = document.getElementById('stars');
+      const starCount = 80;
+      
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        
+        // Случайные параметры для звезд
+        const size = Math.random() * 2.5;
+        const posX = Math.random() * 100;
+        const posY = Math.random() * 100;
+        const delay = Math.random() * 4;
+        const duration = 2 + Math.random() * 4;
+        
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${posX}%`;
+        star.style.top = `${posY}%`;
+        star.style.animationDelay = `${delay}s`;
+        star.style.animationDuration = `${duration}s`;
+        
+        starsContainer.appendChild(star);
+      }
+    }
+    
+    // Функция для переключения между разделами
+    function showSection(sectionId) {
+      // Скрыть все разделы
+      document.querySelectorAll('.page').forEach(section => {
+        section.classList.add('hidden');
+      });
+      
+      // Показать нужный раздел
+      document.getElementById(sectionId).classList.remove('hidden');
+      
+      // Прокрутка вверх
+      window.scrollTo(0, 0);
+    }
+    
+    // Показать/скрыть поля в зависимости от типа поверхности
+    function toggleSurfaceFields() {
+      const surfaceType = document.getElementById('surface-type').value;
+      
+      // Скрыть все поля
+      document.getElementById('rectangle-fields').classList.add('hidden');
+      document.getElementById('square-fields').classList.add('hidden');
+      document.getElementById('complex-fields').classList.add('hidden');
+      
+      // Показать нужные поля
+      if (surfaceType === 'rectangle') {
+        document.getElementById('rectangle-fields').classList.remove('hidden');
+      } else if (surfaceType === 'square') {
+        document.getElementById('square-fields').classList.remove('hidden');
+      } else if (surfaceType === 'complex') {
+        document.getElementById('complex-fields').classList.remove('hidden');
+      }
+    }
+    
+    // Показать/скрыть поля в зависимости от типа балки
+    document.getElementById('beam-type').addEventListener('change', function() {
+      const beamType = this.value;
+      const standardFields = document.getElementById('standard-beam-fields');
+      const customFields = document.getElementById('custom-beam-fields');
+      
+      if (beamType === 'standard') {
+        standardFields.classList.remove('hidden');
+        customFields.classList.add('hidden');
+      } else {
+        standardFields.classList.add('hidden');
+        customFields.classList.remove('hidden');
+      }
+    });
+    
+    // Показать/скрыть поля в зависимости от типа трубы
+    document.getElementById('tube-type').addEventListener('change', function() {
+      const tubeType = this.value;
+      const standardFields = document.getElementById('standard-tube-fields');
+      const customFields = document.getElementById('custom-tube-fields');
+      
+      if (tubeType === 'standard') {
+        standardFields.classList.remove('hidden');
+        customFields.classList.add('hidden');
+      } else {
+        standardFields.classList.add('hidden');
+        customFields.classList.remove('hidden');
+      }
+    });
+    
+    // Показать/скрыть поля в зависимости от типа расчета конуса
+    function toggleConeFields() {
+      const calculationType = document.getElementById('cone-calculation-type').value;
+      
+      // Скрыть все поля
+      document.getElementById('cone-radius-fields').classList.add('hidden');
+      document.getElementById('cone-diameter-fields').classList.add('hidden');
+      
+      // Показать нужные поля
+      if (calculationType === 'radius') {
+        document.getElementById('cone-radius-fields').classList.remove('hidden');
+      } else if (calculationType === 'diameter') {
+        document.getElementById('cone-diameter-fields').classList.remove('hidden');
+      }
+    }
+    
+    // Функция расчета площади стен
+    function calculateWallArea() {
+      const length = parseFloat(document.getElementById('wall-length').value);
+      const width = parseFloat(document.getElementById('wall-width').value);
+      const height = parseFloat(document.getElementById('wall-height').value);
+      const windows = parseInt(document.getElementById('wall-windows').value);
+      const windowSize = document.getElementById('wall-window-size').value;
+      const doors = parseInt(document.getElementById('wall-doors').value);
+      const doorSize = document.getElementById('wall-door-size').value;
+      
+      if (isNaN(length) || isNaN(width) || isNaN(height) || isNaN(windows) || isNaN(doors)) {
+        alert('Пожалуйста, введите все значения для расчета площади стен');
+        return;
+      }
+      
+      // Размеры окон
+      const windowSizeParts = windowSize.split('x').map(d => parseFloat(d));
+      const windowWidth = windowSizeParts[0];
+      const windowHeight = windowSizeParts[1];
+      
+      // Размеры дверей
+      const doorSizeParts = doorSize.split('x').map(d => parseFloat(d));
+      const doorWidth = doorSizeParts[0];
+      const doorHeight = doorSizeParts[1];
+      
+      // Общая площадь стен
+      const perimeter = 2 * (length + width);
+      const wallArea = perimeter * height;
+      
+      // Площадь проемов
+      const windowArea = windows * windowWidth * windowHeight;
+      const doorArea = doors * doorWidth * doorHeight;
+      const openingsArea = windowArea + doorArea;
+      
+      // Полезная площадь стен
+      const usefulWallArea = wallArea - openingsArea;
+      
+      resultText = `
+        <p><strong>Длина помещения:</strong> ${length} м</p>
+        <p><strong>Ширина помещения:</strong> ${width} м</p>
+        <p><strong>Высота помещения:</strong> ${height} м</p>
+        <p><strong>Количество окон:</strong> ${windows} шт.</p>
+        <p><strong>Размер окон:</strong> ${windowWidth}×${windowHeight} м</p>
+        <p><strong>Площадь окон:</strong> ${windowArea.toFixed(2)} м²</p>
+        <p><strong>Количество дверей:</strong> ${doors} шт.</p>
+        <p><strong>Размер дверей:</strong> ${doorWidth}×${doorHeight} м</p>
+        <p><strong>Площадь дверей:</strong> ${doorArea.toFixed(2)} м²</p>
+        <p><strong>Общая площадь стен:</strong> ${wallArea.toFixed(2)} м²</p>
+        <p><strong>Площадь проемов:</strong> ${openingsArea.toFixed(2)} м²</p>
+        <p><strong>Полезная площадь стен:</strong> ${usefulWallArea.toFixed(2)} м²</p>
+        <p><strong>Расчет выполнен по математическим формулам</strong></p>
+      `;
+      
+      // Показываем результаты
+      document.getElementById('wall-area-result-text').innerHTML = resultText;
+      document.getElementById('wall-area-result').style.display = 'block';
+    }
+    
+    // Функция расчета площади потолка и пола
+    function calculateCeilingFloorArea() {
+      const surfaceType = document.getElementById('surface-type').value;
+      
+      let resultText = '';
+      let totalArea = 0;
+      
+      if (surfaceType === 'rectangle') {
+        const length = parseFloat(document.getElementById('floor-length').value);
+        const width = parseFloat(document.getElementById('floor-width').value);
+        
+        if (isNaN(length) || isNaN(width)) {
+          alert('Пожалуйста, введите длину и ширину помещения');
+          return;
+        }
+        
+        totalArea = length * width;
+        
+        resultText = `
+          <p><strong>Тип поверхности:</strong> Прямоугольная</p>
+          <p><strong>Длина помещения:</strong> ${length} м</p>
+          <p><strong>Ширина помещения:</strong> ${width} м</p>
+          <p><strong>Площадь поверхности:</strong> ${totalArea.toFixed(2)} м²</p>
+        `;
+      }
+      else if (surfaceType === 'square') {
+        const side = parseFloat(document.getElementById('floor-side').value);
+        
+        if (isNaN(side)) {
+          alert('Пожалуйста, введите сторону помещения');
+          return;
+        }
+        
+        totalArea = side * side;
+        
+        resultText = `
+          <p><strong>Тип поверхности:</strong> Квадратная</p>
+          <p><strong>Сторона помещения:</strong> ${side} м</p>
+          <p><strong>Площадь поверхности:</strong> ${totalArea.toFixed(2)} м²</p>
+        `;
+      }
+      else if (surfaceType === 'complex') {
+        const rectangles = parseInt(document.getElementById('floor-rectangles').value);
+        const triangles = parseInt(document.getElementById('floor-triangles').value);
+        const trapezoids = parseInt(document.getElementById('floor-trapezoids').value);
+        
+        if (isNaN(rectangles) || isNaN(triangles) || isNaN(trapezoids)) {
+          alert('Пожалуйста, введите количество фигур');
+          return;
+        }
+        
+        // Пример расчета для сложной формы
+        let rectanglesArea = 0;
+        let trianglesArea = 0;
+        let trapezoidsArea = 0;
+        
+        // Для простоты используем средние значения
+        if (rectangles > 0) {
+          rectanglesArea = rectangles * 10; // 10 м² на прямоугольник
+        }
+        
+        if (triangles > 0) {
+          trianglesArea = triangles * 5; // 5 м² на треугольник
+        }
+        
+        if (trapezoids > 0) {
+          trapezoidsArea = trapezoids * 7; // 7 м² на трапецию
+        }
+        
+        totalArea = rectanglesArea + trianglesArea + trapezoidsArea;
+        
+        resultText = `
+          <p><strong>Тип поверхности:</strong> Сложная форма</p>
+          <p><strong>Количество прямоугольников:</strong> ${rectangles} шт.</p>
+          <p><strong>Количество треугольников:</strong> ${triangles} шт.</p>
+          <p><strong>Количество трапеций:</strong> ${trapezoids} шт.</p>
+          <p><strong>Площадь прямоугольников:</strong> ${rectanglesArea.toFixed(2)} м²</p>
+          <p><strong>Площадь треугольников:</strong> ${trianglesArea.toFixed(2)} м²</p>
+          <p><strong>Площадь трапеций:</strong> ${trapezoidsArea.toFixed(2)} м²</p>
+          <p><strong>Общая площадь поверхности:</strong> ${totalArea.toFixed(2)} м²</p>
+        `;
+      }
+      
+      resultText += `<p><strong>Расчет выполнен по математическим формулам</strong></p>`;
+      
+      // Показываем результаты
+      document.getElementById('ceiling-floor-area-result-text').innerHTML = resultText;
+      document.getElementById('ceiling-floor-area-result').style.display = 'block';
+    }
+    
+    // Функция расчета площади покрытия балки
+    function calculateBeamArea() {
+      const beamType = document.getElementById('beam-type').value;
+      const length = parseFloat(document.getElementById('beam-length').value);
+      const quantity = parseInt(document.getElementById('beam-quantity').value);
+      
+      if (isNaN(length) || isNaN(quantity)) {
+        alert('Пожалуйста, введите длину и количество балок');
+        return;
+      }
+      
+      let height, flangeWidth, flangeThickness, webThickness;
+      
+      if (beamType === 'standard') {
+        const mark = document.getElementById('beam-mark').value;
+        
+        // Параметры балок в мм
+        const beamParams = {
+          '10': [100, 55, 4.5, 7.2],
+          '12': [120, 64, 4.8, 7.3],
+          '14': [140, 73, 4.9, 7.5],
+          '16': [160, 81, 5.0, 7.8],
+          '18': [180, 90, 5.1, 8.1],
+          '20': [200, 100, 5.2, 8.4],
+          '22': [220, 110, 5.4, 8.7],
+          '24': [240, 115, 5.6, 9.5],
+          '27': [270, 125, 6.0, 9.8],
+          '30': [300, 135, 6.5, 10.2]
+        };
+        
+        [height, flangeWidth, flangeThickness, webThickness] = beamParams[mark];
+      } else {
+        height = parseFloat(document.getElementById('beam-height').value);
+        flangeWidth = parseFloat(document.getElementById('beam-flange-width').value);
+        flangeThickness = parseFloat(document.getElementById('beam-flange-thickness').value);
+        webThickness = parseFloat(document.getElementById('beam-web-thickness').value);
+        
+        if (isNaN(height) || isNaN(flangeWidth) || isNaN(flangeThickness) || isNaN(webThickness)) {
+          alert('Пожалуйста, введите все параметры балки');
+          return;
+        }
+      }
+      
+      // Конвертируем мм в м
+      height /= 1000;
+      flangeWidth /= 1000;
+      flangeThickness /= 1000;
+      webThickness /= 1000;
+      
+      // Площадь поверхности одной балки (м²)
+      // 2 боковые поверхности + 2 полки
+      const beamSurfaceArea = 2 * (height * length) + 2 * (2 * flangeWidth * length);
+      
+      // Общая площадь поверхности
+      const totalSurfaceArea = beamSurfaceArea * quantity;
+      
+      resultText = `
+        <p><strong>Тип балки:</strong> ${beamType === 'standard' ? 'Стандартная' : 'Пользовательская'}</p>
+        ${beamType === 'standard' ? `<p><strong>Марка балки:</strong> ${document.getElementById('beam-mark').value}</p>` : ''}
+        <p><strong>Высота балки:</strong> ${height * 1000} мм</p>
+        <p><strong>Ширина полки:</strong> ${flangeWidth * 1000} мм</p>
+        <p><strong>Толщина полки:</strong> ${flangeThickness * 1000} мм</p>
+        <p><strong>Толщина стенки:</strong> ${webThickness * 1000} мм</p>
+        <p><strong>Длина балки:</strong> ${length} м</p>
+        <p><strong>Количество балок:</strong> ${quantity} шт.</p>
+        <p><strong>Площадь поверхности одной балки:</strong> ${beamSurfaceArea.toFixed(2)} м²</p>
+        <p><strong>Общая площадь поверхности:</strong> ${totalSurfaceArea.toFixed(2)} м²</p>
+        <p><strong>Расчет выполнен по математическим формулам</strong></p>
+      `;
+      
+      // Показываем результаты
+      document.getElementById('beam-area-result-text').innerHTML = resultText;
+      document.getElementById('beam-area-result').style.display = 'block';
+    }
+    
+    // Функция расчета площади покрытия трубы
+    function calculateTubeArea() {
+      const tubeType = document.getElementById('tube-type').value;
+      const tubeLength = parseFloat(document.getElementById('tube-length').value);
+      const quantity = parseInt(document.getElementById('tube-quantity').value);
+      
+      if (isNaN(tubeLength) || isNaN(quantity)) {
+        alert('Пожалуйста, введите длину и количество труб');
+        return;
+      }
+      
+      let diameter;
+      
+      if (tubeType === 'standard') {
+        diameter = parseFloat(document.getElementById('tube-diameter').value);
+      } else {
+        diameter = parseFloat(document.getElementById('tube-custom-diameter').value);
+      }
+      
+      if (isNaN(diameter)) {
+        alert('Пожалуйста, введите диаметр трубы');
+        return;
+      }
+      
+      // Конвертируем мм в м
+      diameter /= 1000;
+      
+      // Площадь поверхности одной трубы (боковая поверхность цилиндра)
+      const tubeSurfaceArea = Math.PI * diameter * tubeLength;
+      
+      // Общая площадь поверхности
+      const totalSurfaceArea = tubeSurfaceArea * quantity;
+      
+      resultText = `
+        <p><strong>Тип трубы:</strong> ${tubeType === 'standard' ? 'Стандартная' : 'Пользовательская'}</p>
+        <p><strong>Наружный диаметр:</strong> ${diameter * 1000} мм</p>
+        <p><strong>Длина трубы:</strong> ${tubeLength} м</p>
+        <p><strong>Количество труб:</strong> ${quantity} шт.</p>
+        <p><strong>Площадь поверхности одной трубы:</strong> ${tubeSurfaceArea.toFixed(2)} м²</p>
+        <p><strong>Общая площадь поверхности:</strong> ${totalSurfaceArea.toFixed(2)} м²</p>
+        <p><strong>Расчет выполнен по математическим формулам</strong></p>
+      `;
+      
+      // Показываем результаты
+      document.getElementById('tube-area-result-text').innerHTML = resultText;
+      document.getElementById('tube-area-result').style.display = 'block';
+    }
+    
+    // Функция расчета площади конуса
+    function calculateConeArea() {
+      const calculationType = document.getElementById('cone-calculation-type').value;
+      const height = parseFloat(document.getElementById('cone-height').value);
+      const quantity = parseInt(document.getElementById('cone-quantity').value);
+      
+      if (isNaN(height) || isNaN(quantity)) {
+        alert('Пожалуйста, введите высоту и количество конусов');
+        return;
+      }
+      
+      let radius;
+      
+      if (calculationType === 'radius') {
+        radius = parseFloat(document.getElementById('cone-radius').value);
+      } else {
+        const diameter = parseFloat(document.getElementById('cone-diameter').value);
+        radius = diameter / 2;
+      }
+      
+      if (isNaN(radius)) {
+        alert('Пожалуйста, введите радиус или диаметр основания');
+        return;
+      }
+      
+      // Образующая конуса
+      const l = Math.sqrt(radius * radius + height * height);
+      
+      // Площадь основания
+      const baseArea = Math.PI * radius * radius;
+      
+      // Боковая поверхность
+      const lateralArea = Math.PI * radius * l;
+      
+      // Полная поверхность
+      const totalArea = baseArea + lateralArea;
+      
+      // Общая площадь для всех конусов
+      const totalSurfaceArea = totalArea * quantity;
+      
+      resultText = `
+        <p><strong>Тип расчета:</strong> ${calculationType === 'radius' ? 'По радиусу' : 'По диаметру'}</p>
+        <p><strong>Радиус основания:</strong> ${radius} м</p>
+        <p><strong>Высота конуса:</strong> ${height} м</p>
+        <p><strong>Образующая конуса:</strong> ${l.toFixed(2)} м</p>
+        <p><strong>Площадь основания:</strong> ${baseArea.toFixed(2)} м²</p>
+        <p><strong>Боковая поверхность:</strong> ${lateralArea.toFixed(2)} м²</p>
+        <p><strong>Полная поверхность одного конуса:</strong> ${totalArea.toFixed(2)} м²</p>
+        <p><strong>Количество конусов:</strong> ${quantity} шт.</p>
+        <p><strong>Общая площадь поверхности:</strong> ${totalSurfaceArea.toFixed(2)} м²</p>
+        <p><strong>Расчет выполнен по математическим формулам</strong></p>
+      `;
+      
+      // Показываем результаты
+      document.getElementById('cone-area-result-text').innerHTML = resultText;
+      document.getElementById('cone-area-result').style.display = 'block';
+    }
+    
+    // Функция расчета площади трапеции
+    function calculateTrapezoidArea() {
+      const top = parseFloat(document.getElementById('trapezoid-top').value);
+      const bottom = parseFloat(document.getElementById('trapezoid-bottom').value);
+      const height = parseFloat(document.getElementById('trapezoid-height').value);
+      const quantity = parseInt(document.getElementById('trapezoid-quantity').value);
+      
+      if (isNaN(top) || isNaN(bottom) || isNaN(height) || isNaN(quantity)) {
+        alert('Пожалуйста, введите все значения для расчета площади трапеции');
+        return;
+      }
+      
+      // Площадь одной трапеции
+      const trapezoidArea = ((top + bottom) / 2) * height;
+      
+      // Общая площадь
+      const totalArea = trapezoidArea * quantity;
+      
+      resultText = `
+        <p><strong>Длина верхнего основания:</strong> ${top} м</p>
+        <p><strong>Длина нижнего основания:</strong> ${bottom} м</p>
+        <p><strong>Высота трапеции:</strong> ${height} м</p>
+        <p><strong>Площадь одной трапеции:</strong> ${trapezoidArea.toFixed(2)} м²</p>
+        <p><strong>Количество трапеций:</strong> ${quantity} шт.</p>
+        <p><strong>Общая площадь:</strong> ${totalArea.toFixed(2)} м²</p>
+        <p><strong>Расчет выполнен по математическим формулам</strong></p>
+      `;
+      
+      // Показываем результаты
+      document.getElementById('trapezoid-area-result-text').innerHTML = resultText;
+      document.getElementById('trapezoid-area-result').style.display = 'block';
+    }
+    
+    // Функция расчета площади тетраэдра
+    function calculateTetrahedronArea() {
+      const edge = parseFloat(document.getElementById('tetrahedron-edge').value);
+      const quantity = parseInt(document.getElementById('tetrahedron-quantity').value);
+      
+      if (isNaN(edge) || isNaN(quantity)) {
+        alert('Пожалуйста, введите длину ребра и количество тетраэдров');
+        return;
+      }
+      
+      // Площадь одного равностороннего треугольника
+      const triangleArea = (Math.sqrt(3) / 4) * edge * edge;
+      
+      // Полная площадь поверхности тетраэдра (4 треугольника)
+      const tetrahedronArea = 4 * triangleArea;
+      
+      // Общая площадь для всех тетраэдров
+      const totalSurfaceArea = tetrahedronArea * quantity;
+      
+      resultText = `
+        <p><strong>Длина ребра:</strong> ${edge} м</p>
+        <p><strong>Площадь одного треугольника:</strong> ${triangleArea.toFixed(2)} м²</p>
+        <p><strong>Площадь поверхности одного тетраэдра:</strong> ${tetrahedronArea.toFixed(2)} м²</p>
+        <p><strong>Количество тетраэдров:</strong> ${quantity} шт.</p>
+        <p><strong>Общая площадь поверхности:</strong> ${totalSurfaceArea.toFixed(2)} м²</p>
+        <p><strong>Расчет выполнен по математическим формулам</strong></p>
+      `;
+      
+      // Показываем результаты
+      document.getElementById('tetrahedron-area-result-text').innerHTML = resultText;
+      document.getElementById('tetrahedron-area-result').style.display = 'block';
+    }
+    
+    // Функция для инициализации приложения
+    function initApp() {
+      createStars();
+      
+      // Установка обработчиков событий
+      document.getElementById('beam-type').addEventListener('change', function() {
+        const beamType = this.value;
+        const standardFields = document.getElementById('standard-beam-fields');
+        const customFields = document.getElementById('custom-beam-fields');
+        
+        if (beamType === 'standard') {
+          standardFields.classList.remove('hidden');
+          customFields.classList.add('hidden');
+        } else {
+          standardFields.classList.add('hidden');
+          customFields.classList.remove('hidden');
+        }
+      });
+      
+      document.getElementById('tube-type').addEventListener('change', function() {
+        const tubeType = this.value;
+        const standardFields = document.getElementById('standard-tube-fields');
+        const customFields = document.getElementById('custom-tube-fields');
+        
+        if (tubeType === 'standard') {
+          standardFields.classList.remove('hidden');
+          customFields.classList.add('hidden');
+        } else {
+          standardFields.classList.add('hidden');
+          customFields.classList.remove('hidden');
+        }
+      });
+      
+      // Показываем главное меню по умолчанию
+      showSection('main-menu');
+      
+      // Плавная прокрутка
+      document.querySelectorAll('.submenu, .calculator-container').forEach(container => {
+        container.addEventListener('touchstart', function(e) {
+          this.startY = e.touches[0].clientY;
+        });
+        
+        container.addEventListener('touchmove', function(e) {
+          if (!this.startY) return;
+          
+          const deltaY = e.touches[0].clientY - this.startY;
+          this.scrollTop -= deltaY;
+          this.startY = e.touches[0].clientY;
+          e.preventDefault();
+        });
+      });
+    }
+    
+    // Инициализация при загрузке страницы
+    window.onload = initApp;
+  </script>
+</body>
+</html>
